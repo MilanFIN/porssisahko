@@ -4,6 +4,8 @@ const { JSDOM } = jsdom;
 import cacheData from "memory-cache";
 
 const CACHEDURATION = 1; //hours
+const NEWSURL = "http://yle.fi"
+const IMAGEURL = "https://images.cdn.yle.fi/image/upload/w_196,h_110,ar_1.7777777777777777,dpr_1,c_fill/q_auto:eco,f_auto,fl_lossy/v420/"
 
 const yle = async (req: NextApiRequest, res: NextApiResponse) => {
   const value = cacheData.get("yle");
@@ -26,8 +28,8 @@ const yle = async (req: NextApiRequest, res: NextApiResponse) => {
     initialState.pageData.layout.forEach((element: any) => {
       let result = {
         header: element.texts.headline.text,
-        url: element.url,
-        image: element.image.id,
+        url: NEWSURL+ element.url,
+        image: IMAGEURL + element.image.id,
         imagealt: element.image.alt,
       };
       results.push(result);

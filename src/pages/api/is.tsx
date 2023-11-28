@@ -1,0 +1,50 @@
+import { NextApiRequest, NextApiResponse } from "next";
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+import cacheData from "memory-cache";
+
+const CACHEDURATION = 1; //hours
+const NEWSURL = "https://www.is.fi/art-"
+const NEWSENDURL = ".html"
+
+const IS = async (req: NextApiRequest, res: NextApiResponse) => {
+	const value = cacheData.get("is");
+	if (value) {
+	  res.status(200).json(value);
+	} else {
+  
+		const response = await fetch("https://www.is.fi/aihe/sahko/");
+		let data = await response.text();
+		let results: any = [];
+
+		const dom = new JSDOM(data);
+		//fetching all article links
+		let tags = dom.window.document.getElementsByClassName("teaser-m__border");
+		let images = dom.window.document.getElementsByTagName("img");
+		
+		let tagsArray = [...tags];
+		tagsArray.forEach((element:any, index:number) => {
+
+			let headerDom = element.getElementsByClassName("teaser-title-30");
+			let imgDom = element.getElementsByTagName("img");
+			if (headerDom.length != 0 && imgDom.length != 0) {
+				let result = {
+					"header" : headerDom[0].textContent,
+					"href": NEWSURL + element.getAttribute('data-id') + NEWSENDURL,
+					"image": imgDom[0].src
+				}
+				results.push(result)
+
+			}
+
+		});
+		
+
+		cacheData.put("is", results, CACHEDURATION * 1000 * 60 * 60);
+		res.status(200).json({data:results});
+	}
+  
+};
+
+export default IS;
+
