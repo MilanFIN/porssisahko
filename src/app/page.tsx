@@ -1,25 +1,23 @@
-"use client";
-import Image from 'next/image'
-import { useEffect } from 'react'
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
-export default function Home() {
+import NewsList from "@/components/newslist";
 
-  const getYleContent = async () => {
-    const headers = {}
-    let res:any, err = await fetch("/api/yle");
-    console.log(res);
-  }
+const getYleContent = async () => {
+  const response = await fetch("http://localhost:3000/api/yle");
+  let test = await response.json();
+  return test;
+};
 
-  useEffect(() => {
-    getYleContent();
-  }, [])
-
+export default async function Home() {
+  const yleArticles = await getYleContent();
+  //const [yleArticles, setYleArticles] = useState([]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between ">
       <div className="w-full h-full">
-        test
+        <NewsList yleArticles={yleArticles} />
       </div>
     </main>
-  )
+  );
 }
