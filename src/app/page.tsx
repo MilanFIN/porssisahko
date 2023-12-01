@@ -2,22 +2,38 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import NewsList from "@/components/newslist";
+import { getHsContent, getIlContent, getIsContent, getYleContent } from "./utils/newsgetters";
 
-const getYleContent = async () => {
-  const response = await fetch("http://localhost:3000/api/yle");
-  let test = await response.json();
-  return test;
-};
 
 export default async function Home() {
   const yleArticles = await getYleContent();
-  //const [yleArticles, setYleArticles] = useState([]);
-
+  const hsArticles = await getHsContent();
+  const isArticles = await getIsContent();
+  const ilArticles = await getIlContent();
+  
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between ">
-      <div className="w-full h-full">
-        <NewsList yleArticles={yleArticles} />
+    <main className=" h-full ">
+      <div className="w-full h-[800px] ">
+
+        <h2 className="text-xl text-center w-full">Aiheeseen liittyviä uutisia</h2>
+        <div className="flex h-full justify-between">
+          <div className="w-1/4 h-full m-2">
+            <NewsList source="YLE" articles={yleArticles} />
+          </div>
+          <div className="w-1/4 h-full m-2">
+            <NewsList source="HS" articles={hsArticles} />
+          </div>      
+          <div className="w-1/4 h-full m-2">
+            <NewsList source="IS" articles={isArticles} />
+          </div>      
+          <div className="w-1/4 h-full m-2">
+            <NewsList source="IL" articles={ilArticles} />
+          </div>
+
+
+        </div>
       </div>
     </main>
   );
 }
+
