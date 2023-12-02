@@ -46,7 +46,7 @@ export default async function Home() {
 
   const priceData = await getPriceData();
 
-  const   chartData = {
+  const chartData = {
     labels: priceData.map((data:any) => data.Timestamp),//Data.map((data) => data.year), 
     datasets: [
       {
@@ -54,36 +54,33 @@ export default async function Home() {
         data: priceData.map((data:any) => data.Value),//[Data.map((data) => data.userGain)],
         /*backgroundColor: [
           "rgba(75,192,192,1)",
-          "#ecf0f1",
-          "#50AF95",
-          "#f3ba2f",
-          "#2a71d0"
         ],*/
         borderColor: "black",
         borderWidth: 2
       }
     ]
   };
+
  
-  
+  //Math.max(chartData.datasets[0].data)}
   return (
     <main className=" h-full ">
       <div className="w-full h-[800px] ">
 
-        <LineChart chartData={chartData}/>
+        <LineChart chartData={chartData} />
 
         <h2 className="text-xl text-center w-full">Aiheeseen liittyviä uutisia</h2>
-        <div className="flex h-full justify-between">
-          <div className="w-1/4 h-full m-2">
+        <div className="flex flex-wrap h-full items-center justify-center">
+          <div className="min-w-[430px] w-1/6 h-full m-2">
             <NewsList source="YLE" articles={yleArticles} />
           </div>
-          <div className="w-1/4 h-full m-2">
+          <div className="min-w-[430px] w-1/6 h-full m-2">
             <NewsList source="HS" articles={hsArticles} />
           </div>      
-          <div className="w-1/4 h-full m-2">
+          <div className="min-w-[430px] w-1/6 h-full m-2">
             <NewsList source="IS" articles={isArticles} />
           </div>      
-          <div className="w-1/4 h-full m-2">
+          <div className="min-w-[430px] w-1/6 h-full m-2">
             <NewsList source="IL" articles={ilArticles} />
           </div>
 

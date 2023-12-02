@@ -15,7 +15,7 @@ function NewsList(props: NewsListProps) {
       <ul className="h-full overflow-y-auto rounded-lg bg-gray-400">
           {props.articles.slice(0, 20).map((item:any) =>
             <li key={item.header} 
-            className="mb-2 bg-gray-200 rounded-lg p-2">
+            className="mb-2 bg-gray-200 rounded-lg p-2 hover:bg-yellow-200">
               <a  className="w-full flex" 
               
                 href={item.href}>
