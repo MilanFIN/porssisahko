@@ -8,6 +8,7 @@ interface NewsListProps {
 function NewsList(props: NewsListProps) {
 
 
+
   return (
     <div className="h-full bg-gray-400 px-2 rounded-lg pb-8">
       <h3 className="text-lg">{props.source}</h3>
