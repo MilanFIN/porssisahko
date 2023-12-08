@@ -64,25 +64,46 @@ export default async function Home() {
  
   //Math.max(chartData.datasets[0].data)}
   return (
-    <main className=" h-full ">
-      <div className="w-full h-[800px] ">
+    <main className="w-full h-full  ">
 
-        <LineChart chartData={chartData} />
 
-        <h2 className="text-xl text-center w-full">Aiheeseen liittyviä uutisia</h2>
-        <div className="flex flex-wrap h-full items-center justify-center">
-          <div className="min-w-[430px] w-1/6 h-full m-2">
-            <NewsList source="YLE" articles={yleArticles} />
+      <div className="w-full h-[800px] xl:flex ">
+        <div className="xl:w-[50%] w-full">
+          <div className="w-full grid text-center">
+          <h1 className="text-4xl justify-center text-gray-800">Pörssisähkön hinta</h1>
+            <p className="xl:w-2/3 w-5/6 justify-self-center mt-8">
+              Tämän sivun tarkoitus on näyttää pörssisähkön hinta seuraavalle päivälle ja edeltävälle 3 kuukaudelle.
+              Sivulla näkyvän kuvaajan lisäksi on listattuna jonkin verran asiaan liityviä uutisia.
+
+              Lähdekoodi on näkyvissä <a href="https://github.com/MilanFIN/porssisahko" className="text-blue-500">Githubissa</a>
+            </p>
           </div>
-          <div className="min-w-[430px] w-1/6 h-full m-2">
-            <NewsList source="HS" articles={hsArticles} />
-          </div>      
-          <div className="min-w-[430px] w-1/6 h-full m-2">
-            <NewsList source="IS" articles={isArticles} />
-          </div>      
-          <div className="min-w-[430px] w-1/6 h-full m-2">
-            <NewsList source="IL" articles={ilArticles} />
+          <div className="w-full mt-8">
+
+            <LineChart chartData={chartData} />
           </div>
+
+        </div>
+
+        <div className="xl:w-[50%] w-full h-full items-top flex">
+        <div className="flex flex-wrap h-full items-center justify-center align-top">
+
+          <h1 className="w-full grow text-center text-4xl mb-8">Aiheeseen liittyviä uutisia</h1>
+
+            <div className="w-[430px] h-full mx-2 my-3">
+              <NewsList source="YLE" articles={yleArticles} />
+            </div>
+            <div className="w-[430px] h-full mx-2 my-3">
+              <NewsList source="HS" articles={hsArticles} />
+            </div>      
+            <div className="w-[430px] h-full mx-2 my-3">
+              <NewsList source="IS" articles={isArticles} />
+            </div>      
+            <div className="w-[430px] h-full mx-2 my-3">
+              <NewsList source="IL" articles={ilArticles} />
+            </div>
+
+        </div>
 
 
         </div>

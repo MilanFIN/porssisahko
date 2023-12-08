@@ -31,6 +31,7 @@ const yle = async (req: NextApiRequest, res: NextApiResponse) => {
         url: NEWSURL+ element.url,
         image: IMAGEURL + element.image.id,
         imagealt: element.image.alt,
+        date: element.publishedAt
       };
       results.push(result);
     });

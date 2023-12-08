@@ -92,11 +92,10 @@ function LineChart(props: ChartData) {
   }
 
   return (
-    <div className="w-full flex items-center justify-center">
+    <div className="w-full">
 
       <div className={`chart-container 
-            lg:w-1/2 w-[90%]`}>
-        <h2 style={{ textAlign: "center" }}>Hinta</h2>
+            w-full`}>
         <div className="flex">		
           <button className={`rounded-2xl mx-1 py-2 px-4 hover:bg-yellow-200  ${tax == 0 ? "bg-yellow-400":"bg-gray-300"}`} onClick={() => setTax(0)}>alv 0%</button>
           <button className={`rounded-2xl mx-1 py-2 px-4 hover:bg-yellow-200 ${tax !== 0 ? "bg-yellow-400":"bg-gray-300"}`} onClick={() => setTax(0.24)}>alv 24%</button>

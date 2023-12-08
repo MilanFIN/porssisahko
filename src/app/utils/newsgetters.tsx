@@ -26,6 +26,8 @@ export const getYleContent = async () => {
         href: NEWSURL+ element.url,
         image: IMAGEURL + element.image.id,
         imagealt: element.image.alt,
+		date: element.publishedAt
+
       };
       results.push(result);
     });
@@ -81,13 +83,34 @@ export const getIsContent = async () => {
 	let tagsArray = [...tags];
 	tagsArray.forEach((element:any, index:number) => {
 
+
 		let headerDom = element.getElementsByClassName("teaser-title-30");
+		let timeLabel = element.getElementsByClassName("timestamp-label")[0].textContent;
+
+		let content = timeLabel.split(" ");
+		let date = new Date();
+		if (content.length == 1) { //eg. 15:10
+			let time = timeLabel.split(":");
+			date.setHours(time[0])
+			date.setMinutes(time[1]);
+		}
+		else if (content.length == 2) { //eg. 6.12. 15:10
+			let dayAndMonth = content[0].split(".")
+			let time = content[1].split(":")
+			date.setMonth(dayAndMonth[1]-1)
+			date.setDate(dayAndMonth[0]);
+			date.setHours(time[0]);
+			date.setMinutes(time[1]);
+		}
+		console.log(content)
+
 		let imgDom = element.getElementsByTagName("img");
 		if (headerDom.length != 0 && imgDom.length != 0) {
 			let result = {
-				header : headerDom[0].textContent,
-				href: NEWSURL + element.getAttribute('data-id') + NEWSENDURL,
-				image: imgDom[0].src
+				"header" : headerDom[0].textContent,
+				"href": NEWSURL + element.getAttribute('data-id') + NEWSENDURL,
+				"image": imgDom[0].src,
+				"date": date.toISOString()
 			}
 			results.push(result)
 
