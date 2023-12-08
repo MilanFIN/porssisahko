@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import NewsList from "@/components/newslist";
 import { getHsContent, getIlContent, getIsContent, getPriceData, getYleContent } from "./utils/newsgetters";
 import LineChart from "@/components/linechart";
+import News from "@/components/news";
 
 const Data = [
   {
@@ -68,7 +69,7 @@ export default async function Home() {
 
 
       <div className="w-full h-[800px] xl:flex ">
-        <div className="xl:w-[50%] w-full">
+        <div className="xl:w-[70%] w-full">
           <div className="w-full grid text-center">
           <h1 className="text-4xl justify-center text-gray-800">Pörssisähkön hinta</h1>
             <p className="xl:w-2/3 w-5/6 justify-self-center mt-8">
@@ -85,23 +86,12 @@ export default async function Home() {
 
         </div>
 
-        <div className="xl:w-[50%] w-full h-full items-top flex">
-        <div className="flex flex-wrap h-full items-center justify-center align-top">
+        <div className="xl:w-[30%] w-full h-full items-top flex">
+        <div className="flex flex-wrap w-full h-full items-center justify-center align-top">
 
           <h1 className="w-full grow text-center text-4xl mb-8">Aiheeseen liittyviä uutisia</h1>
 
-            <div className="w-[430px] h-full mx-2 my-3">
-              <NewsList source="YLE" articles={yleArticles} />
-            </div>
-            <div className="w-[430px] h-full mx-2 my-3">
-              <NewsList source="HS" articles={hsArticles} />
-            </div>      
-            <div className="w-[430px] h-full mx-2 my-3">
-              <NewsList source="IS" articles={isArticles} />
-            </div>      
-            <div className="w-[430px] h-full mx-2 my-3">
-              <NewsList source="IL" articles={ilArticles} />
-            </div>
+          <News articles={[yleArticles, hsArticles, isArticles, ilArticles]} sources={["YLE", "HS", "IS", "IL"]}/>
 
         </div>
 

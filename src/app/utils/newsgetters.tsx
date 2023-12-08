@@ -102,7 +102,6 @@ export const getIsContent = async () => {
 			date.setHours(time[0]);
 			date.setMinutes(time[1]);
 		}
-		console.log(content)
 
 		let imgDom = element.getElementsByTagName("img");
 		if (headerDom.length != 0 && imgDom.length != 0) {

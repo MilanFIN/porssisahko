@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useState } from "react";
 
 interface NewsListProps {
@@ -25,8 +27,7 @@ function NewsList(props: NewsListProps) {
   }
 
   return (
-    <div className="h-full bg-gray-300 px-2 rounded-lg pb-8">
-      <h3 className="text-lg">{props.source}</h3>
+    <div className="h-full bg-gray-300 p-2">
       <ul className="h-full overflow-y-auto rounded-lg bg-gray-300">
           {props.articles.slice(0, 20).map((item:any) =>
             <li key={item.header} 
