@@ -40,8 +40,8 @@ export default async function Home() {
         <main className="w-full h-full  ">
             <div className="w-full h-[800px] xl:flex ">
                 <div className="xl:w-[70%] w-full">
-                    <div className="w-full grid text-center">
-                        <h1 className="text-4xl justify-center text-gray-800">
+                    <div className="w-full h-[20%] grid text-center">
+                        <h1 className="text-4xl justify-center text-gray-800 ">
                             Pörssisähkön hinta
                         </h1>
                         <p className="xl:w-2/3 w-5/6 justify-self-center mt-8">
@@ -58,26 +58,28 @@ export default async function Home() {
                             </a>
                         </p>
                     </div>
-                    <div className="w-full mt-8">
+                    <div className="w-full">
                         <LineChart chartData={chartData} />
                     </div>
                 </div>
 
-                <div className="xl:w-[30%] w-full h-full items-top flex">
+                <div className="xl:w-[30%] w-full items-top flex">
                     <div className="flex flex-wrap w-full h-full items-center justify-center align-top">
-                        <h1 className="w-full grow text-center text-4xl mb-8">
+                        <h1 className="w-full h-[10%] grow text-center text-4xl mb-8">
                             Aiheeseen liittyviä uutisia
                         </h1>
 
-                        <News
-                            articles={[
-                                yleArticles,
-                                hsArticles,
-                                isArticles,
-                                ilArticles,
-                            ]}
-                            sources={["YLE", "HS", "IS", "IL"]}
-                        />
+                        <div className="h-[90%]">
+                            <News
+                                articles={[
+                                    yleArticles,
+                                    hsArticles,
+                                    isArticles,
+                                    ilArticles,
+                                ]}
+                                sources={["YLE", "HS", "IS", "IL"]}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

@@ -153,7 +153,8 @@ function LineChart(props: ChartData) {
                     options={{
                         elements: {
                             point: {
-                                radius: 0,
+                                radius: history < 10 ? 3 : 0,
+                                backgroundColor: "black",
                             },
                         },
                         plugins: {
@@ -163,6 +164,33 @@ function LineChart(props: ChartData) {
                             },
                             legend: {
                                 display: false,
+                            },
+                            tooltip: {
+                                backgroundColor: "#fef08a",
+                                titleColor: "black",
+                                bodyColor: "black",
+                                callbacks: {
+                                    label: function (context) {
+                                        let value = (
+                                            context.parsed.y / 10
+                                        ).toFixed(1);
+
+                                        return value + " snt/kWh";
+                                    },
+                                    title: function (context) {
+                                        let title = context[0].label;
+                                        let date = new Date(title);
+                                        return (
+                                            date.getDate() +
+                                            "." +
+                                            (date.getMonth() + 1) +
+                                            " " +
+                                            zeroPad(date.getHours()) +
+                                            ":" +
+                                            zeroPad(date.getMinutes())
+                                        );
+                                    },
+                                },
                             },
                         },
                         scales: {

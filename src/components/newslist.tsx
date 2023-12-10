@@ -24,20 +24,20 @@ function NewsList(props: NewsListProps) {
     };
 
     return (
-        <div className="h-full bg-gray-300 p-2">
-            <ul className="h-full overflow-y-auto rounded-lg bg-gray-300">
+        <div className="h-full w-full bg-gray-300 p-2">
+            <ul className="h-full w-full overflow-y-auto rounded-lg bg-gray-300">
                 {props.articles.slice(0, 20).map((item: any) => (
                     <li
                         key={item.header}
-                        className="mb-2 bg-gray-100 rounded-lg p-2 hover:bg-yellow-200"
+                        className="w-full mb-2 bg-gray-100 rounded-lg p-2 hover:bg-yellow-200"
                     >
-                        <a className="w-full flex" href={item.href}>
+                        <a className="w-full flex " href={item.href}>
                             <img
-                                className="w-[177px] h-[100px] object-cover rounded-lg mr-2"
+                                className=" h-[100px] flex-none object-cover rounded-lg mr-2" //w-[177px]
                                 src={item.image}
                             ></img>
-                            <div>
-                                <span className="">{item.header}</span>
+                            <div className=" grow">
+                                <span className="w-full">{item.header}</span>
                                 <br />
                                 <span>{formatDate(new Date(item.date))}</span>
                             </div>
