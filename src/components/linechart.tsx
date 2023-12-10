@@ -151,10 +151,15 @@ function LineChart(props: ChartData) {
                 <Line
                     data={chartData}
                     options={{
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                          },
                         animation: false,
                         elements: {
                             point: {
-                                radius: history < 10 ? 3 : 0,
+                                radius: 0,
                                 backgroundColor: "black",
                             },
                         },

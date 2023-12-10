@@ -25,7 +25,7 @@ function NewsList(props: NewsListProps) {
 
     return (
         <div className="h-full w-full bg-gray-300 p-2">
-            <ul className="h-full w-full overflow-y-auto rounded-lg bg-gray-300">
+            <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
                 {props.articles.slice(0, 20).map((item: any) => (
                     <li
                         key={item.header}

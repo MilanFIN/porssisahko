@@ -21,14 +21,11 @@ export default async function Home() {
     const priceData = await getPriceData();
 
     const chartData = {
-        labels: priceData.map((data: any) => data.Timestamp), //Data.map((data) => data.year),
+        labels: priceData.map((data: any) => data.Timestamp),
         datasets: [
             {
                 label: "Hinta " + priceData.map((data: any) => data.Timestamp),
-                data: priceData.map((data: any) => data.Value), //[Data.map((data) => data.userGain)],
-                /*backgroundColor: [
-          "rgba(75,192,192,1)",
-        ],*/
+                data: priceData.map((data: any) => data.Value),
                 borderColor: "black",
                 borderWidth: 2,
             },
@@ -37,11 +34,11 @@ export default async function Home() {
 
     //Math.max(chartData.datasets[0].data)}
     return (
-        <main className="w-full h-full  ">
+        <main className="w-full h-full bg-gradient-to-b from-yellow-100 to-white ">
             <div className="w-full h-[800px] xl:flex ">
                 <div className="xl:w-[70%] w-full">
                     <div className="w-full h-[20%] grid text-center">
-                        <h1 className="text-4xl justify-center text-gray-800 ">
+                        <h1 className="text-4xl justify-center text-gray-800 mt-4">
                             Pörssisähkön hinta
                         </h1>
                         <p className="xl:w-2/3 w-5/6 justify-self-center mt-8">
@@ -63,9 +60,9 @@ export default async function Home() {
                     </div>
                 </div>
 
-                <div className="xl:w-[30%] w-full items-top flex">
+                <div className="xl:w-[30%] w-full h-full items-top flex">
                     <div className="flex flex-wrap w-full h-full items-center justify-center align-top">
-                        <h1 className="w-full h-[10%] grow text-center text-4xl mb-8">
+                        <h1 className="w-full h-[10%] grow text-center text-4xl my-4">
                             Aiheeseen liittyviä uutisia
                         </h1>
 
