@@ -151,6 +151,7 @@ function LineChart(props: ChartData) {
                 <Line
                     data={chartData}
                     options={{
+                        animation: false,
                         elements: {
                             point: {
                                 radius: history < 10 ? 3 : 0,
@@ -166,6 +167,7 @@ function LineChart(props: ChartData) {
                                 display: false,
                             },
                             tooltip: {
+                                displayColors: false,
                                 backgroundColor: "#fef08a",
                                 titleColor: "black",
                                 bodyColor: "black",

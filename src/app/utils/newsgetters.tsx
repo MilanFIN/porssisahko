@@ -6,7 +6,7 @@ export const getYleContent = async () => {
     const IMAGEURL =
         "https://images.cdn.yle.fi/image/upload/w_196,h_110,ar_1.7777777777777777,dpr_1,c_fill/q_auto:eco,f_auto,fl_lossy/v420/";
 
-    const response = await fetch("https://yle.fi/uutiset/18-205950");
+    const response = await fetch("https://yle.fi/uutiset/18-205950", { next: { revalidate: 3600 } });
     let data = await response.text();
     let results: any = [];
 
@@ -37,7 +37,7 @@ export const getHsContent = async () => {
     const NEWSURL = "https://www.hs.fi/art-";
     const NEWSENDURL = ".html";
 
-    const response = await fetch("https://www.hs.fi/aihe/sahko/");
+    const response = await fetch("https://www.hs.fi/aihe/sahko/", { next: { revalidate: 3600 } });
     let data = await response.text();
     let results: any = [];
 
@@ -67,7 +67,7 @@ export const getIsContent = async () => {
     const NEWSURL = "https://www.is.fi/art-";
     const NEWSENDURL = ".html";
 
-    const response = await fetch("https://www.is.fi/aihe/sahko/");
+    const response = await fetch("https://www.is.fi/aihe/sahko/", { next: { revalidate: 3600 } });
     let data = await response.text();
     let results: any = [];
 
@@ -118,7 +118,8 @@ export const getIlContent = async () => {
     const NEWSURL = "https://www.iltalehti.fi/";
 
     const response = await fetch(
-        "https://api.il.fi/v1/articles/search?q=s%C3%A4hk%C3%B6&limit=10&image_sizes[]=size138"
+        "https://api.il.fi/v1/articles/search?q=s%C3%A4hk%C3%B6&limit=10&image_sizes[]=size138",
+        { next: { revalidate: 3600 } }
     );
     let data = await response.json();
     data = data.response;
@@ -157,7 +158,7 @@ export const getPriceData = async () => {
     let isoThreeMonthsAgo = threeMonthsAgo.toISOString();
 
     let source = `https://www.fingrid.fi/api/graph/dataset?variableId[]=106&start=${isoThreeMonthsAgo}&end=${isoTomorrow}`;
-    const response = await fetch(source);
+    const response = await fetch(source, { next: { revalidate: 3600 } });
     let data = await response.json();
 
     return data[0].Values;

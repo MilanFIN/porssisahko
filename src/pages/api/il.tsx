@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-import cacheData from "memory-cache";
+const cacheData = require("memory-cache");
 
 const CACHEDURATION = 1; //hours
 const NEWSURL = "https://www.iltalehti.fi/";
