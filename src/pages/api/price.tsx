@@ -1,24 +1,36 @@
+import { zeroPad } from "@/common/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 
+
+
 const price = async (req: NextApiRequest, res: NextApiResponse) => {
-    var currentDate = new Date();
     // Get tomorrow's date
-    let tomorrow = new Date(currentDate);
-    tomorrow.setDate(currentDate.getDate() + 1);
-    tomorrow.setHours(23, 59, 59, 999); // Set to the end of the day
-    let isoTomorrow = tomorrow.toISOString();
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 2);
+    tomorrow.setHours(0,0,0,0); 
+    let tomorrowStamp = tomorrow.getFullYear().toString() + zeroPad(tomorrow.getMonth()+1)
+                            + zeroPad(tomorrow.getDate())+ zeroPad(tomorrow.getHours()) + zeroPad(tomorrow.getMinutes());
 
-    let sevenDaysAgo = new Date(
-        currentDate.getTime() - 7 * 24 * 60 * 60 * 1000
-    );
-    sevenDaysAgo.setHours(0, 0, 0, 0);
-    let isoSevenDaysAgo = sevenDaysAgo.toISOString();
+    
+    
+    let threeMonthsAgo = new Date();
+    threeMonthsAgo.setDate(threeMonthsAgo.getDate() -90);
+    threeMonthsAgo.setHours(0, 0, 0, 0);
 
-    let source = `https://www.fingrid.fi/api/graph/dataset?variableId[]=106&start=${isoSevenDaysAgo}&end=${isoTomorrow}`;
-    const response = await fetch(source);
-    let data = await response.json();
+
+    let threeMonthStamp = threeMonthsAgo.getFullYear().toString() + zeroPad(threeMonthsAgo.getMonth()+1)
+                + zeroPad(threeMonthsAgo.getDate()) + zeroPad(threeMonthsAgo.getHours()) + zeroPad(threeMonthsAgo.getMinutes());
+
+    let token = process.env.ENTSOE_SECURITY_TOKEN;
+
+    let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`
+    const response = await fetch(url, { next: { revalidate: 3600 } });
+    const data = await response.text();
 
     res.status(200).json({ data: data });
 };
 
+
+
 export default price;
+

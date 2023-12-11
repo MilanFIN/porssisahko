@@ -28,6 +28,7 @@ import {
     Tooltip,
 } from "chart.js";
 import { useEffect, useState } from "react";
+import { zeroPad } from "@/common/utils";
 
 Chart.register(
     ArcElement,
@@ -88,13 +89,7 @@ function LineChart(props: ChartData) {
         setChartData(newChartData);
     }, [tax, history]);
 
-    const zeroPad = function (value: number) {
-        let strValue = value.toString();
-        if (strValue.length < 2) {
-            strValue = "0" + strValue;
-        }
-        return strValue;
-    };
+
 
     return (
         <div className="w-full">
