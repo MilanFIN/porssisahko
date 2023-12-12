@@ -1,12 +1,17 @@
+import { zeroPad } from "@/common/utils";
+
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+var convert = require("xml-js");
 
 export const getYleContent = async () => {
     const NEWSURL = "http://yle.fi";
     const IMAGEURL =
         "https://images.cdn.yle.fi/image/upload/w_196,h_110,ar_1.7777777777777777,dpr_1,c_fill/q_auto:eco,f_auto,fl_lossy/v420/";
 
-    const response = await fetch("https://yle.fi/uutiset/18-205950", { next: { revalidate: 3600 } });
+    const response = await fetch("https://yle.fi/uutiset/18-205950", {
+        next: { revalidate: 3600 },
+    });
     let data = await response.text();
     let results: any = [];
 
@@ -37,7 +42,9 @@ export const getHsContent = async () => {
     const NEWSURL = "https://www.hs.fi/art-";
     const NEWSENDURL = ".html";
 
-    const response = await fetch("https://www.hs.fi/aihe/sahko/", { next: { revalidate: 3600 } });
+    const response = await fetch("https://www.hs.fi/aihe/sahko/", {
+        next: { revalidate: 3600 },
+    });
     let data = await response.text();
     let results: any = [];
 
@@ -67,7 +74,9 @@ export const getIsContent = async () => {
     const NEWSURL = "https://www.is.fi/art-";
     const NEWSENDURL = ".html";
 
-    const response = await fetch("https://www.is.fi/aihe/sahko/", { next: { revalidate: 3600 } });
+    const response = await fetch("https://www.is.fi/aihe/sahko/", {
+        next: { revalidate: 3600 },
+    });
     let data = await response.text();
     let results: any = [];
 
@@ -135,7 +144,7 @@ export const getIlContent = async () => {
                 "/" +
                 element.article_id,
             image: element.main_image_urls["size138"],
-            date: element.published_at
+            date: element.published_at,
         };
         results.push(result);
     });
@@ -162,4 +171,61 @@ export const getPriceData = async () => {
     let data = await response.json();
 
     return data[0].Values;
+};
+
+export const getDayAheadData = async () => {
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 2);
+    tomorrow.setHours(0, 0, 0, 0);
+    let tomorrowStamp =
+        tomorrow.getFullYear().toString() +
+        zeroPad(tomorrow.getMonth() + 1) +
+        zeroPad(tomorrow.getDate()) +
+        zeroPad(tomorrow.getHours()) +
+        zeroPad(tomorrow.getMinutes());
+
+    let threeMonthsAgo = new Date();
+    threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
+    threeMonthsAgo.setHours(0, 0, 0, 0);
+
+    let threeMonthStamp =
+        threeMonthsAgo.getFullYear().toString() +
+        zeroPad(threeMonthsAgo.getMonth() + 1) +
+        zeroPad(threeMonthsAgo.getDate()) +
+        zeroPad(threeMonthsAgo.getHours()) +
+        zeroPad(threeMonthsAgo.getMinutes());
+
+    let token = process.env.ENTSOE_SECURITY_TOKEN;
+
+    let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
+    const response = await fetch(url, { next: { revalidate: 3600 } });
+    const data = await response.text();
+
+    let jsonData = JSON.parse(
+        convert.xml2json(data, { compact: true, spaces: 4 })
+    );
+    let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
+
+    let timeData: any = [];
+
+    timeSeriesData.forEach((element: any) => {
+        let period = element.Period;
+        let startTime = new Date(period.timeInterval.start._text);
+        let dataPoints = period.Point;
+
+        dataPoints.forEach((point: any) => {
+            let hoursOffset = parseInt(point.position._text) - 1;
+            let correspondingDate = new Date(startTime.getTime());
+            correspondingDate.setHours(
+                correspondingDate.getHours() + hoursOffset
+            );
+            let price = parseFloat(point["price.amount"]._text);
+            timeData.push({
+                Timestamp: correspondingDate.toISOString(),
+                Value: price,
+            });
+        });
+    });
+
+    return timeData;
 };

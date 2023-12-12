@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import NewsList from "@/components/newslist";
 import {
+    getDayAheadData,
     getHsContent,
     getIlContent,
     getIsContent,
@@ -18,7 +19,7 @@ export default async function Home() {
     const isArticles = await getIsContent();
     const ilArticles = await getIlContent();
 
-    const priceData = await getPriceData();
+    const priceData = await getDayAheadData();
 
     const chartData = {
         labels: priceData.map((data: any) => data.Timestamp),
@@ -41,19 +42,30 @@ export default async function Home() {
                         <h1 className="text-4xl justify-center text-gray-800 mt-4">
                             Pörssisähkön hinta
                         </h1>
-                        <p className="xl:w-2/3 w-5/6 justify-self-center mt-8">
-                            Tämän sivun tarkoitus on näyttää pörssisähkön hinta
-                            seuraavalle päivälle ja edeltävälle 3 kuukaudelle.
-                            Sivulla näkyvän kuvaajan lisäksi on listattuna
-                            jonkin verran asiaan liityviä uutisia. Lähdekoodi on
-                            näkyvissä{" "}
-                            <a
-                                href="https://github.com/MilanFIN/porssisahko"
-                                className="text-blue-500"
-                            >
-                                Githubissa
-                            </a>
-                        </p>
+                        <div className="xl:w-2/3 w-5/6 justify-self-center mt-8">
+                            <p>
+                                Tämän sivun tarkoitus on näyttää pörssisähkön
+                                hinta seuraavalle päivälle ja edeltävälle 3
+                                kuukaudelle. Sivulla näkyvän kuvaajan lisäksi on
+                                listattuna jonkin verran asiaan liityviä
+                                uutisia. Lähdekoodi on näkyvissä{" "}
+                                <a
+                                    href="https://github.com/MilanFIN/porssisahko"
+                                    className="text-blue-500"
+                                >
+                                    Githubissa
+                                </a>
+                            </p>
+                            <p>
+                                Hintadatan lähde:{" "}
+                                <a
+                                    href="https://transparency.entsoe.eu"
+                                    className="text-blue-500"
+                                >
+                                    ENTSO-E
+                                </a>
+                            </p>
+                        </div>
                     </div>
                     <div className="w-full">
                         <LineChart chartData={chartData} />
