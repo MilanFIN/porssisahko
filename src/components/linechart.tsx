@@ -1,5 +1,8 @@
 "use client";
 import { Line } from "react-chartjs-2";
+import "chartjs-plugin-annotation";
+import annotationPlugin from "chartjs-plugin-annotation";
+import Annotation from "chartjs-plugin-annotation";
 
 import {
     Chart,
@@ -26,6 +29,7 @@ import {
     Legend,
     Title,
     Tooltip,
+    scales,
 } from "chart.js";
 import { useEffect, useState } from "react";
 import { zeroPad } from "@/common/utils";
@@ -53,7 +57,9 @@ Chart.register(
     Filler,
     Legend,
     Title,
-    Tooltip
+    Tooltip,
+    //annotationPlugin,
+    Annotation
 );
 
 interface ChartData {
@@ -89,7 +95,64 @@ function LineChart(props: ChartData) {
         setChartData(newChartData);
     }, [tax, history]);
 
+    const parseCustomDate = (dateString: string) => {
+        const parts = dateString.split(" "); // Split date and time
+        const datePart = parts[0].split("."); // Split day and month
+        const timePart = parts[1];
 
+        // Parsing day, month, year manually
+        const day = parseInt(datePart[0], 10);
+        const month = parseInt(datePart[1], 10) - 1; // Months in JavaScript start from 0 (January is 0)
+        const currentYear = new Date().getFullYear(); // You might want to set a year here
+        const year = currentYear;
+
+        // Parsing hours and minutes from timePart
+        const [hours, minutes] = timePart
+            .split(":")
+            .map((part) => parseInt(part, 10));
+
+        // Create a new Date object with the parsed values
+        const parsedDate = new Date(year, month, day, hours, minutes);
+
+        return parsedDate;
+    };
+
+    const calculateProgress = (start: Date, end: Date, now: Date) => {
+        const totalDuration = end.getTime() / 1000 - start.getTime() / 1000;
+        const elapsedTime = now.getTime() / 1000 - start.getTime() / 1000;
+        let progress = elapsedTime / totalDuration;
+        return progress;
+    };
+
+    const plugins = [
+        {
+            afterDraw: (chart: { tooltip?: any; scales?: any; ctx?: any, platform?:any }) => {
+                if (chart.tooltip._active && chart.tooltip._active.length) {
+                    const activePoint = chart.tooltip._active[0];
+                    const { ctx } = chart;
+                    let { x } = activePoint.element; 
+
+                    const topY = chart.scales.y.top;
+                    const bottomY = chart.scales.y.bottom;
+
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, topY);
+                    ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "black";
+                    ctx.stroke();
+                    ctx.restore();
+
+                }
+
+
+
+               
+            },
+        },
+    ];
 
     return (
         <div className="w-full">
@@ -145,12 +208,13 @@ function LineChart(props: ChartData) {
 
                 <Line
                     data={chartData}
+                    plugins={plugins}
                     options={{
                         interaction: {
-                            mode: 'nearest',
-                            axis: 'x',
-                            intersect: false
-                          },
+                            mode: "nearest",
+                            axis: "x",
+                            intersect: false,
+                        },
                         animation: false,
                         elements: {
                             point: {
@@ -197,6 +261,7 @@ function LineChart(props: ChartData) {
                         },
                         scales: {
                             x: {
+                                offset: false,
                                 ticks: {
                                     callback: function (
                                         value: any,

@@ -67,8 +67,10 @@ export default async function Home() {
                             </p>
                         </div>
                     </div>
-                    <div className="w-full">
-                        <LineChart chartData={chartData} />
+                    <div className="w-full grid justify-items-center">
+                        <div className="w-[95%]">
+                            <LineChart chartData={chartData} />
+                        </div>
                     </div>
                 </div>
 
