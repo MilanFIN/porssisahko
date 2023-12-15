@@ -80,15 +80,15 @@ export default async function Home() {
                             Aiheeseen liittyviä uutisia
                         </h1>
 
-                        <div className="h-[90%]">
+                        <div className="h-[90%] w-full">
                             <News
                                 articles={[
                                     yleArticles,
                                     hsArticles,
-                                    isArticles,
                                     ilArticles,
+                                    isArticles,
                                 ]}
-                                sources={["YLE", "HS", "IS", "IL"]}
+                                sources={["YLE", "HS", "IL", "IS"]}
                             />
                         </div>
                     </div>
