@@ -126,7 +126,8 @@ function LineChart(props: ChartData) {
 
     const plugins = [
         {
-            afterDraw: (chart: { tooltip?: any; scales?: any; ctx?: any, platform?:any }) => {
+            id: "cursorHoverVerticalLine",
+            afterDraw: ( chart: { tooltip?: any; scales?: any; ctx?: any }) => {
                 if (chart.tooltip._active && chart.tooltip._active.length) {
                     const activePoint = chart.tooltip._active[0];
                     const { ctx } = chart;
@@ -151,6 +152,7 @@ function LineChart(props: ChartData) {
 
                
             },
+            
         },
     ];
 
