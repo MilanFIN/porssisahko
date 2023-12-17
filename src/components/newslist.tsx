@@ -18,7 +18,9 @@ function NewsList(props: NewsListProps) {
         const diffTime = Math.abs(current - articleDate.getTime());
 
         if (diffTime < 24 * 60 * 60 * 1000) {
-            return articleDate.getHours() + ":" + zeroPad(articleDate.getMinutes());
+            return (
+                articleDate.getHours() + ":" + zeroPad(articleDate.getMinutes())
+            );
         } else {
             return articleDate.getDate() + "." + (articleDate.getMonth() + 1);
         }
@@ -40,7 +42,9 @@ function NewsList(props: NewsListProps) {
                             <div className=" grow">
                                 <span className="w-full">{item.header}</span>
                                 <br />
-                                <span className="w-full">{formatDate(new Date(item.date))}</span>
+                                <span className="w-full">
+                                    {formatDate(new Date(item.date))}
+                                </span>
                             </div>
                         </a>
                     </li>

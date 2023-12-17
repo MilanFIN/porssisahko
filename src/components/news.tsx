@@ -16,11 +16,11 @@ function News(props: NewsProps) {
 
     return (
         <div className="h-full w-full">
-            <div className="flex w-full justify-center">
+            <div className="flex w-full justify-center bg-gray-100 rounded-t-xl">
                 {props.sources.map((source: String, index: number) => (
                     <button
                         key={source.toString()}
-                        className={`grow text-lg hover:bg-gray-300 text-center h-12 ${
+                        className={`rounded-t-xl grow text-lg hover:bg-gray-300 text-center h-12 ${
                             index == activeSource
                                 ? "bg-gray-300"
                                 : "bg-gray-100 "

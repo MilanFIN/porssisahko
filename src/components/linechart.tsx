@@ -79,12 +79,23 @@ function LineChart(props: ChartData) {
 
         let count = props.chartData.labels.length;
 
+        let includedDayCount = history;
+        if (history == 1) {
+            let latestDate = new Date(
+                newChartData.labels[newChartData.labels.length - 2]
+            );
+            let now = new Date();
+            if (latestDate.getDay() != now.getDay()) {
+                includedDayCount = 2;
+            }
+        }
+
         newChartData.datasets[0].data = newChartData.datasets[0].data.slice(
-            count - 24 * history,
+            count - 24 * includedDayCount,
             count
         );
         newChartData.labels = newChartData.labels.slice(
-            count - 24 * history,
+            count - 24 * includedDayCount,
             count
         );
         newChartData.datasets[0].data.forEach((value: any, index: number) => {
@@ -126,16 +137,31 @@ function LineChart(props: ChartData) {
 
     const plugins = [
         {
+            id: "backgroundColor",
+            beforeDraw: (
+                chart: { ctx?: any; width?: number; height?: number },
+                args: any,
+                options: any
+            ) => {
+                const { ctx } = chart;
+                ctx.save();
+                ctx.globalCompositeOperation = "destination-over";
+                ctx.fillStyle = options.color || "#fafafac0";
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            },
+        },
+
+        {
             id: "cursorHoverVerticalLine",
-            afterDraw: ( chart: { tooltip?: any; scales?: any; ctx?: any }) => {
+            afterDraw: (chart: { tooltip?: any; scales?: any; ctx?: any }) => {
                 if (chart.tooltip._active && chart.tooltip._active.length) {
                     const activePoint = chart.tooltip._active[0];
                     const { ctx } = chart;
-                    let { x } = activePoint.element; 
+                    let { x } = activePoint.element;
 
                     const topY = chart.scales.y.top;
                     const bottomY = chart.scales.y.bottom;
-
 
                     ctx.save();
                     ctx.beginPath();
@@ -145,14 +171,8 @@ function LineChart(props: ChartData) {
                     ctx.strokeStyle = "black";
                     ctx.stroke();
                     ctx.restore();
-
                 }
-
-
-
-               
             },
-            
         },
     ];
 
@@ -162,9 +182,9 @@ function LineChart(props: ChartData) {
                 className={`chart-container 
             w-full`}
             >
-                <div className="flex">
+                <div className="flex mb-2">
                     <button
-                        className={`rounded-2xl mx-1 py-2 px-4 hover:bg-yellow-200  ${
+                        className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400  ${
                             tax == 0 ? "bg-yellow-400" : "bg-gray-300"
                         }`}
                         onClick={() => setTax(0)}
@@ -172,7 +192,7 @@ function LineChart(props: ChartData) {
                         alv 0%
                     </button>
                     <button
-                        className={`rounded-2xl mx-1 py-2 px-4 hover:bg-yellow-200 ${
+                        className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
                             tax !== 0 ? "bg-yellow-400" : "bg-gray-300"
                         }`}
                         onClick={() => setTax(0.24)}
@@ -181,9 +201,16 @@ function LineChart(props: ChartData) {
                     </button>
 
                     <span className="grow"></span>
-
                     <button
-                        className={`rounded-2xl mx-1 py-2 px-4 hover:bg-yellow-200 ${
+                        className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
+                            history == 1 ? "bg-yellow-400" : "bg-gray-300"
+                        }`}
+                        onClick={() => setHistory(1)}
+                    >
+                        1pv
+                    </button>
+                    <button
+                        className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
                             history == 7 ? "bg-yellow-400" : "bg-gray-300"
                         }`}
                         onClick={() => setHistory(7)}
@@ -191,7 +218,7 @@ function LineChart(props: ChartData) {
                         1vk
                     </button>
                     <button
-                        className={`rounded-2xl mx-1 py-2 px-4 hover:bg-yellow-200 ${
+                        className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
                             history == 30 ? "bg-yellow-400" : "bg-gray-300"
                         }`}
                         onClick={() => setHistory(30)}
@@ -199,7 +226,7 @@ function LineChart(props: ChartData) {
                         1kk
                     </button>
                     <button
-                        className={`rounded-2xl mx-1 py-2 px-4 hover:bg-yellow-200 ${
+                        className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
                             history == 90 ? "bg-yellow-400" : "bg-gray-300"
                         }`}
                         onClick={() => setHistory(90)}

@@ -200,7 +200,7 @@ export const getDayAheadData = async () => {
     let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
     const response = await fetch(url, { next: { revalidate: 3600 } });
     if (response.status != 200) {
-        return []
+        return [];
     }
     const data = await response.text();
 

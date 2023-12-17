@@ -35,14 +35,14 @@ export default async function Home() {
 
     //Math.max(chartData.datasets[0].data)}
     return (
-        <main className="w-full h-full bg-gradient-to-b from-yellow-100 to-white ">
-            <div className="w-full h-[800px] xl:flex ">
-                <div className="xl:w-[70%] w-full">
+        <main className="w-full h-full bg-gradient-to-b from-yellow-100 to-yellow-200 ">
+            <div className="w-full h-full xl:flex min-h-screen">
+                <div className="xl:w-[70%] w-full h-full">
                     <div className="w-full h-[20%] grid text-center">
                         <h1 className="text-4xl justify-center text-gray-800 mt-4">
                             Pörssisähkön hinta
                         </h1>
-                        <div className="xl:w-2/3 w-5/6 justify-self-center mt-8">
+                        <div className="xl:w-2/3 w-5/6 justify-self-center mt-8 h-full">
                             <p>
                                 Tämän sivun tarkoitus on näyttää pörssisähkön
                                 hinta seuraavalle päivälle ja edeltävälle 3
@@ -67,8 +67,8 @@ export default async function Home() {
                             </p>
                         </div>
                     </div>
-                    <div className="w-full grid justify-items-center">
-                        <div className="w-[95%]">
+                    <div className="w-full grid justify-items-center h-full">
+                        <div className="w-[95%] h-full">
                             <LineChart chartData={chartData} />
                         </div>
                     </div>
@@ -80,7 +80,7 @@ export default async function Home() {
                             Aiheeseen liittyviä uutisia
                         </h1>
 
-                        <div className="h-[90%] w-full">
+                        <div className="h-[600px] min-h-[0px] w-full">
                             <News
                                 articles={[
                                     yleArticles,
