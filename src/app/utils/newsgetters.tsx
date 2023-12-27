@@ -4,6 +4,9 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 var convert = require("xml-js");
 
+//should make cache revalidation work
+export const dynamic = 'force-dynamic'
+
 export const getYleContent = async () => {
     const NEWSURL = "http://yle.fi";
     const IMAGEURL =
