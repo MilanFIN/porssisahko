@@ -40,7 +40,9 @@ function NewsList(props: NewsListProps) {
                                 src={item.image}
                             ></img>
                             <div className=" grow">
-                                <span className="w-full">{item.header}</span>
+                                <span className="w-full font-bold">
+                                    {item.header}
+                                </span>
                                 <br />
                                 <span className="w-full">
                                     {formatDate(new Date(item.date))}

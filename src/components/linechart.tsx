@@ -33,6 +33,7 @@ import {
 } from "chart.js";
 import { useEffect, useState } from "react";
 import { zeroPad } from "@/common/utils";
+import { InfoBox } from "./infobox";
 
 Chart.register(
     ArcElement,
@@ -178,6 +179,17 @@ function LineChart(props: ChartData) {
 
     return (
         <div className="w-full">
+            {
+/*
+            <div className="w-full flex flex-wrap justify-center mb-4">
+                <InfoBox description={"Hinta nyt"} price={0.0}/>
+                <InfoBox description={"Keskihinta 1pv"} price={0.0}/>
+                <InfoBox description={"Keskihinta 1vk"} price={0.0}/>
+                <InfoBox description={"Keskihinta 1kk"} price={0.0}/>
+
+            </div>
+                       */ }
+
             <div
                 className={`chart-container 
             w-full`}
