@@ -4,6 +4,7 @@ import { zeroPad } from "@/common/utils";
 import React, { useEffect, useState } from "react";
 
 interface InfoBoxProps {
+	tax: number
     price: number;
     description: String;
 }
@@ -11,6 +12,7 @@ interface InfoBoxProps {
 export function InfoBox(props: InfoBoxProps) {
 
 	const formatPrice = (price:number) => {
+		price += price * props.tax;
 		return price.toFixed(2) + " c/kWh";
 	}
 

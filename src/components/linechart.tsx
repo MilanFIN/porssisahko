@@ -177,18 +177,32 @@ function LineChart(props: ChartData) {
         },
     ];
 
+    const calculateAverage = (hInPast:number) => {
+
+        //console.log(props.chartData)
+        const now = new Date();
+        const ticks = props.chartData.labels;
+        let latestIndex = ticks.findIndex((timestamp:string) => new Date(timestamp) > now) -1;
+        //not found
+        if (latestIndex < 0) {
+            return 0.0;
+        }
+        //console.log(latestIndex)
+        
+        let historyData = props.chartData.datasets[0].data.slice(Math.max(0, latestIndex - hInPast), latestIndex + 1);
+        let avg =  historyData.reduce((acc:number, val:number) => acc + val, 0)  / (hInPast + 1);
+        return avg / 10.0;
+    }
+
     return (
         <div className="w-full">
-            {
-/*
-            <div className="w-full flex flex-wrap justify-center mb-4">
-                <InfoBox description={"Hinta nyt"} price={0.0}/>
-                <InfoBox description={"Keskihinta 1pv"} price={0.0}/>
-                <InfoBox description={"Keskihinta 1vk"} price={0.0}/>
-                <InfoBox description={"Keskihinta 1kk"} price={0.0}/>
 
+            <div className="w-full flex flex-wrap justify-center mb-4">
+                <InfoBox tax={tax} description={"Hinta nyt"} price={calculateAverage(0)}/>
+                <InfoBox tax={tax} description={"Keskihinta 1pv"} price={calculateAverage(23)}/>
+                <InfoBox tax={tax} description={"Keskihinta 1vk"} price={calculateAverage(167)}/>
+                <InfoBox tax={tax} description={"Keskihinta 1kk"} price={calculateAverage(719)}/>
             </div>
-                       */ }
 
             <div
                 className={`chart-container 
@@ -280,7 +294,7 @@ function LineChart(props: ChartData) {
                                     label: function (context) {
                                         let value = (
                                             context.parsed.y / 10
-                                        ).toFixed(1);
+                                        ).toFixed(2);
 
                                         return value + " snt/kWh";
                                     },
