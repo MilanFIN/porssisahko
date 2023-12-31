@@ -17,16 +17,15 @@ import News from "@/components/news";
 //export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-    /*
-    const yleArticles = await getYleContent();
-    const hsArticles = await getHsContent();
-    const isArticles = await getIsContent();
-    const ilArticles = await getIlContent();
-    */
+    
+    const yleArticles = await getYleContent(false);
+    const hsArticles = await getHsContent(false);
+    const isArticles = await getIsContent(false);
+    const ilArticles = await getIlContent(false);
+    
+    const priceData = await getDayAheadData(false);
 
-    const priceData = await getDayAheadData();
-
-    const chartData = {
+    const chartData = priceData != null ? {
         labels: priceData.map((data: any) => data.Timestamp),
         datasets: [
             {
@@ -36,9 +35,19 @@ export default async function Home() {
                 borderWidth: 2,
             },
         ],
+    } : 
+    {
+        labels: [],
+        datasets: [
+            {
+                label: "TBD",
+                data: [],
+                borderColor: "black",
+                borderWidth: 2,
+            },
+        ],
     };
 
-    //Math.max(chartData.datasets[0].data)}
     return (
         <main className="w-full h-full bg-gradient-to-b from-yellow-100 to-yellow-200 ">
             <div className="w-full h-full xl:flex min-h-screen">
@@ -87,6 +96,7 @@ export default async function Home() {
 
                         <div className="h-[600px] min-h-[0px] w-full">
                             <News
+                                articles={[yleArticles, hsArticles, ilArticles, isArticles]}
                                 apiSources={["yle", "hs", "il", "is"]}
                                 sources={["YLE", "HS", "IL", "IS"]}
                             />

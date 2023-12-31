@@ -5,14 +5,12 @@ import NewsList from "./newslist";
 interface NewsProps {
     apiSources: String[];
     sources: String[];
+    articles: any;
 }
 
 function News(props: NewsProps) {
     const [activeSource, setActiveSource] = useState(0);
 
-    const setActive = (source: String) => {
-        console.log(source);
-    };
 
     return (
         <div className="h-full w-full">
@@ -34,6 +32,7 @@ function News(props: NewsProps) {
 
             <div className="w-full h-full ">
                 <NewsList
+                    articles={props.articles[activeSource]}
                     apiSource={props.apiSources[activeSource]}
                     source={props.sources[activeSource]}
                 />

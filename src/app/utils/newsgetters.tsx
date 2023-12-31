@@ -9,12 +9,12 @@ var convert = require("xml-js");
 export const dynamic = "force-dynamic";
 const CACHESECONDS = 3600;
 
-export const getYleContent = async () => {
+export const getYleContent = async (wait: boolean) => {
     const url = "https://yle.fi/uutiset/18-205950";
     const value = cacheData.get(url);
     if (value) {
         return value;
-    } else {
+    } else if (wait) {
         const NEWSURL = "http://yle.fi";
         const IMAGEURL =
             "https://images.cdn.yle.fi/image/upload/w_196,h_110,ar_1.7777777777777777,dpr_1,c_fill/q_auto:eco,f_auto,fl_lossy/v420/";
@@ -47,14 +47,17 @@ export const getYleContent = async () => {
 
         return results;
     }
+    else {
+        return [];
+    }
 };
 
-export const getHsContent = async () => {
+export const getHsContent = async (wait: boolean) => {
     const url = "https://www.hs.fi/aihe/sahko/";
     const value = cacheData.get(url);
     if (value) {
         return value;
-    } else {
+    } else if (wait) {
         const NEWSURL = "https://www.hs.fi/art-";
         const NEWSENDURL = ".html";
 
@@ -87,14 +90,17 @@ export const getHsContent = async () => {
 
         return results;
     }
+    else {
+        return [];
+    }
 };
 
-export const getIsContent = async () => {
+export const getIsContent = async (wait:boolean) => {
     const url = "https://www.is.fi/aihe/sahko/";
     const value = cacheData.get(url);
     if (value) {
         return value;
-    } else {
+    } else if (wait) {
         const NEWSURL = "https://www.is.fi/art-";
         const NEWSENDURL = ".html";
 
@@ -148,15 +154,19 @@ export const getIsContent = async () => {
         cacheData.put(url, results, 1000 * CACHESECONDS);
         return results;
     }
+    else {
+        return [];
+    }
+
 };
 
-export const getIlContent = async () => {
+export const getIlContent = async (wait:boolean) => {
     const url =
         "https://api.il.fi/v1/articles/search?q=s%C3%A4hk%C3%B6&limit=10&image_sizes[]=size138";
     const value = cacheData.get(url);
     if (value) {
         return value;
-    } else {
+    } else if (wait) {
         const NEWSURL = "https://www.iltalehti.fi/";
 
         const response = await fetch(url, { cache: 'no-store' });
@@ -182,6 +192,10 @@ export const getIlContent = async () => {
 
         return results;
     }
+    else {
+        return [];
+    }
+
 };
 
 export const getPriceData = async () => {
@@ -213,12 +227,12 @@ export const getPriceData = async () => {
     }
 };
 
-export const getDayAheadData = async () => {
+export const getDayAheadData = async (wait: boolean) => {
     const key = "entsoe-prices";
     const value = cacheData.get(key);
     if (value) {
         return value;
-    } else {
+    } else if (wait) {
         let tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 2);
         tomorrow.setHours(0, 0, 0, 0);
@@ -280,5 +294,8 @@ export const getDayAheadData = async () => {
         cacheData.put(key, timeData, 1000 * CACHESECONDS);
 
         return timeData;
+    }
+    else {
+        return null;
     }
 };

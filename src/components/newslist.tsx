@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 interface NewsListProps {
     apiSource: String;
     source: String;
+    articles: any;
 }
 
 function NewsList(props: NewsListProps) {
@@ -15,10 +16,15 @@ function NewsList(props: NewsListProps) {
     useEffect(() => {
 
         const getArticles = async () => {
-            setArticles([]);
-            let newArticles = await fetch("/api/"+props.apiSource);
-            let parsedArticles = await newArticles.json();
-            setArticles(parsedArticles);
+            if (props.articles.length != 0) {
+                setArticles(props.articles)
+            }
+            else {
+                setArticles([]);
+                let newArticles = await fetch("/api/"+props.apiSource);
+                let parsedArticles = await newArticles.json();
+                setArticles(parsedArticles);
+            }
     
         }
         getArticles();

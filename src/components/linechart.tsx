@@ -71,14 +71,44 @@ function LineChart(props: ChartData) {
     const [tax, setTax] = useState(0.24);
     const [history, setHistory] = useState(7);
 
+    const [totalChartData, setTotalChartData] = useState(JSON.parse(JSON.stringify(props.chartData)));
+
     const [chartData, setChartData] = useState(
         JSON.parse(JSON.stringify(props.chartData))
     );
 
     useEffect(() => {
-        let newChartData = JSON.parse(JSON.stringify(props.chartData));
 
-        let count = props.chartData.labels.length;
+        const getPriceData = async () => {
+            let priceData = await fetch("/api/price");
+            let parsedData = await priceData.json();
+
+            const newChartData = {
+                labels: parsedData.map((data: any) => data.Timestamp),
+                datasets: [
+                    {
+                        label: parsedData.map((data: any) => data.Timestamp),
+                        data: parsedData.map((data: any) => data.Value),
+                        borderColor: "black",
+                        borderWidth: 2,
+                    },
+                ],
+            }
+            setTotalChartData(newChartData);
+        
+
+        };
+        if (totalChartData.labels.length == 0) {
+            console.log("NOT FOUND")
+            getPriceData();
+
+        }
+    }, []);
+
+    useEffect(() => {
+        let newChartData = JSON.parse(JSON.stringify(totalChartData));
+
+        let count = totalChartData.labels.length;
 
         let includedDayCount = history;
         if (history == 1) {
@@ -105,7 +135,8 @@ function LineChart(props: ChartData) {
             }
         });
         setChartData(newChartData);
-    }, [tax, history]);
+        console.log("updated chart data")
+    }, [tax, history, totalChartData]);
 
     const parseCustomDate = (dateString: string) => {
         const parts = dateString.split(" "); // Split date and time
@@ -179,9 +210,8 @@ function LineChart(props: ChartData) {
 
     const calculateAverage = (hInPast:number) => {
 
-        //console.log(props.chartData)
         const now = new Date();
-        const ticks = props.chartData.labels;
+        const ticks = totalChartData.labels;
         let latestIndex = ticks.findIndex((timestamp:string) => new Date(timestamp) > now) -1;
         //not found
         if (latestIndex < 0) {
@@ -189,7 +219,7 @@ function LineChart(props: ChartData) {
         }
         //console.log(latestIndex)
         
-        let historyData = props.chartData.datasets[0].data.slice(Math.max(0, latestIndex - hInPast), latestIndex + 1);
+        let historyData = totalChartData.datasets[0].data.slice(Math.max(0, latestIndex - hInPast), latestIndex + 1);
         let avg =  historyData.reduce((acc:number, val:number) => acc + val, 0)  / (hInPast + 1);
         return avg / 10.0;
     }
