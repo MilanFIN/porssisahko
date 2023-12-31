@@ -19,7 +19,7 @@ export const getYleContent = async () => {
         const IMAGEURL =
             "https://images.cdn.yle.fi/image/upload/w_196,h_110,ar_1.7777777777777777,dpr_1,c_fill/q_auto:eco,f_auto,fl_lossy/v420/";
 
-        const response = await fetch(url);
+        const response = await fetch(url, { cache: 'no-store' });
         let data = await response.text();
         let results: any = [];
 
@@ -58,7 +58,7 @@ export const getHsContent = async () => {
         const NEWSURL = "https://www.hs.fi/art-";
         const NEWSENDURL = ".html";
 
-        const response = await fetch(url);
+        const response = await fetch(url, { cache: 'no-store' });
         let data = await response.text();
         let results: any = [];
 
@@ -159,7 +159,7 @@ export const getIlContent = async () => {
     } else {
         const NEWSURL = "https://www.iltalehti.fi/";
 
-        const response = await fetch(url);
+        const response = await fetch(url, { cache: 'no-store' });
         let data = await response.json();
         data = data.response;
         let results: any = [];
@@ -204,7 +204,7 @@ export const getPriceData = async () => {
         let isoThreeMonthsAgo = threeMonthsAgo.toISOString();
 
         let source = `https://www.fingrid.fi/api/graph/dataset?variableId[]=106&start=${isoThreeMonthsAgo}&end=${isoTomorrow}`;
-        const response = await fetch(source);
+        const response = await fetch(source, { cache: 'no-store' });
         let data = await response.json();
 
         cacheData.put(key, data[0].Values, 1000 * CACHESECONDS);
@@ -243,7 +243,7 @@ export const getDayAheadData = async () => {
         let token = process.env.ENTSOE_SECURITY_TOKEN || "";
 
         let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
-        const response = await fetch(url, { next: { revalidate: 3600 } });
+        const response = await fetch(url, { cache: 'no-store' });
         if (response.status != 200) {
             cacheData.put(key, [], 1000 * CACHESECONDS);
 
