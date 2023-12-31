@@ -17,10 +17,12 @@ import News from "@/components/news";
 //export const dynamic = 'force-dynamic'
 
 export default async function Home() {
+    /*
     const yleArticles = await getYleContent();
     const hsArticles = await getHsContent();
     const isArticles = await getIsContent();
     const ilArticles = await getIlContent();
+    */
 
     const priceData = await getDayAheadData();
 
@@ -85,12 +87,7 @@ export default async function Home() {
 
                         <div className="h-[600px] min-h-[0px] w-full">
                             <News
-                                articles={[
-                                    yleArticles,
-                                    hsArticles,
-                                    ilArticles,
-                                    isArticles,
-                                ]}
+                                apiSources={["yle", "hs", "il", "is"]}
                                 sources={["YLE", "HS", "IL", "IS"]}
                             />
                         </div>

@@ -5,7 +5,7 @@ const hs = async (req: NextApiRequest, res: NextApiResponse) => {
 
     let results = await getHsContent();
 
-    res.status(200).json({ data: results });
+    res.status(200).json(results);
 };
 
 export default hs;

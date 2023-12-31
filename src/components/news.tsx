@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import NewsList from "./newslist";
 
 interface NewsProps {
-    articles: any;
+    apiSources: String[];
     sources: String[];
 }
 
@@ -34,8 +34,8 @@ function News(props: NewsProps) {
 
             <div className="w-full h-full ">
                 <NewsList
+                    apiSource={props.apiSources[activeSource]}
                     source={props.sources[activeSource]}
-                    articles={props.articles[activeSource]}
                 />
             </div>
         </div>

@@ -4,11 +4,27 @@ import { zeroPad } from "@/common/utils";
 import React, { useEffect, useState } from "react";
 
 interface NewsListProps {
-    articles: [];
+    apiSource: String;
     source: String;
 }
 
 function NewsList(props: NewsListProps) {
+
+    const [articles, setArticles] = useState([]);
+
+    useEffect(() => {
+
+        const getArticles = async () => {
+            setArticles([]);
+            let newArticles = await fetch("/api/"+props.apiSource);
+            let parsedArticles = await newArticles.json();
+            setArticles(parsedArticles);
+    
+        }
+        getArticles();
+    }, [props.apiSource])
+
+
     const formatDate = (articleDate: Date) => {
         if (Number.isNaN(articleDate.getDate())) {
             return "";
@@ -29,7 +45,7 @@ function NewsList(props: NewsListProps) {
     return (
         <div className="h-full w-full bg-gray-300 p-2">
             <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
-                {props.articles.slice(0, 20).map((item: any) => (
+                {articles.length != 0 ? articles.slice(0, 20).map((item: any) => (
                     <li
                         key={item.header}
                         className="w-full mb-2 bg-gray-100 rounded-lg p-2 hover:bg-yellow-200"
@@ -50,7 +66,8 @@ function NewsList(props: NewsListProps) {
                             </div>
                         </a>
                     </li>
-                ))}
+                ))
+            : null}
             </ul>
         </div>
     );
