@@ -1,30 +1,30 @@
 "use client";
 
-import { zeroPad } from "@/common/utils";
+import { zeroPad } from "@/common/common";
 import React, { useEffect, useState } from "react";
 
 interface InfoBoxProps {
-	tax: number
+    tax: number;
     price: number;
     description: String;
+    loading: boolean;
 }
 
 export function InfoBox(props: InfoBoxProps) {
-
-	const formatPrice = (price:number) => {
-		price += price * props.tax;
-		return price.toFixed(2) + " c/kWh";
-	}
+    const formatPrice = (price: number) => {
+        if (props.loading) {
+            return "-";
+        }
+        price += price * props.tax;
+        return price.toFixed(2) + " c/kWh";
+    };
 
     return (
-		<div className="w-32 h-20 m-2 p-2 bg-white grid justify-items-center rounded-lg">
-			<div className="w-full text-center">
-				{props.description}
-			</div>
-			<div className="w-full text-center font-bold">
-				<span>{formatPrice(props.price)} </span>
-			</div>
-
-		</div>
-	);
+        <div className="w-32 h-20 m-2 p-2 bg-white grid justify-items-center rounded-lg">
+            <div className="w-full text-center">{props.description}</div>
+            <div className="w-full text-center font-bold">
+                <span>{formatPrice(props.price)} </span>
+            </div>
+        </div>
+    );
 }

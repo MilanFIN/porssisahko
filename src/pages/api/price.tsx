@@ -1,5 +1,4 @@
 import { getDayAheadData } from "@/app/utils/newsgetters";
-import { zeroPad } from "@/common/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 var convert = require("xml-js");
 

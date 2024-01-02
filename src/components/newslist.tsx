@@ -1,17 +1,18 @@
 "use client";
 
-import { zeroPad } from "@/common/utils";
+import {zeroPad, Article  } from "@/common/common";
 import React, { useEffect, useState } from "react";
 
+
 interface NewsListProps {
-    apiSource: String;
-    source: String;
-    articles: any;
+    apiSource: string;
+    source: string;
+    articles: Array<Article>;
 }
 
 function NewsList(props: NewsListProps) {
 
-    const [articles, setArticles] = useState([]);
+    const [articles, setArticles] = useState<Array<Article>>([]);
 
     useEffect(() => {
 
@@ -21,9 +22,15 @@ function NewsList(props: NewsListProps) {
             }
             else {
                 setArticles([]);
+                let source = props.apiSource;
+
                 let newArticles = await fetch("/api/"+props.apiSource);
                 let parsedArticles = await newArticles.json();
-                setArticles(parsedArticles);
+
+                if (props.apiSource == source) {
+                    setArticles(parsedArticles);
+
+                }
             }
     
         }
@@ -51,7 +58,7 @@ function NewsList(props: NewsListProps) {
     return (
         <div className="h-full w-full bg-gray-300 p-2">
             <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
-                {articles.length != 0 ? articles.slice(0, 20).map((item: any) => (
+                {articles.length != 0 ? articles.slice(0, 20).map((item: Article) => (
                     <li
                         key={item.header}
                         className="w-full mb-2 bg-gray-100 rounded-lg p-2 hover:bg-yellow-200"

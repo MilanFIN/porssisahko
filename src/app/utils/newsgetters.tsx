@@ -1,4 +1,4 @@
-import { zeroPad } from "@/common/utils";
+import { zeroPad } from "@/common/common";
 import cacheData from "memory-cache";
 
 const jsdom = require("jsdom");

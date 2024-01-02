@@ -32,7 +32,7 @@ import {
     scales,
 } from "chart.js";
 import { useEffect, useState } from "react";
-import { zeroPad } from "@/common/utils";
+import { zeroPad } from "@/common/common";
 import { InfoBox } from "./infobox";
 
 Chart.register(
@@ -63,50 +63,61 @@ Chart.register(
     Annotation
 );
 
-interface ChartData {
+interface LineChartProps {
     chartData: any;
 }
 
-function LineChart(props: ChartData) {
+interface PriceData {
+    Timestamp: string;
+    Value: number;
+}
+
+interface ChartData {
+    datasets: Array<any>;
+    labels: Array<string>;
+}
+
+function LineChart(props: LineChartProps) {
     const [tax, setTax] = useState(0.24);
     const [history, setHistory] = useState(7);
 
-    const [totalChartData, setTotalChartData] = useState(JSON.parse(JSON.stringify(props.chartData)));
+    const [totalChartData, setTotalChartData] = useState<ChartData>(
+        JSON.parse(JSON.stringify(props.chartData))
+    );
 
-    const [chartData, setChartData] = useState(
+    const [chartData, setChartData] = useState<ChartData>(
         JSON.parse(JSON.stringify(props.chartData))
     );
 
     useEffect(() => {
-
         const getPriceData = async () => {
             let priceData = await fetch("/api/price");
-            let parsedData = await priceData.json();
+            let parsedData = (await priceData.json()) as Array<PriceData>;
 
             const newChartData = {
-                labels: parsedData.map((data: any) => data.Timestamp),
+                labels: parsedData.map((data: PriceData) => data.Timestamp),
                 datasets: [
                     {
-                        label: parsedData.map((data: any) => data.Timestamp),
-                        data: parsedData.map((data: any) => data.Value),
+                        label: parsedData.map(
+                            (data: PriceData) => data.Timestamp
+                        ),
+                        data: parsedData.map((data: PriceData) => data.Value),
                         borderColor: "black",
                         borderWidth: 2,
                     },
                 ],
-            }
+            };
             setTotalChartData(newChartData);
-        
-
         };
         if (totalChartData.labels.length == 0) {
-            console.log("NOT FOUND")
             getPriceData();
-
         }
     }, []);
 
     useEffect(() => {
-        let newChartData = JSON.parse(JSON.stringify(totalChartData));
+        let newChartData = JSON.parse(
+            JSON.stringify(totalChartData)
+        ) as ChartData;
 
         let count = totalChartData.labels.length;
 
@@ -129,13 +140,14 @@ function LineChart(props: ChartData) {
             count - 24 * includedDayCount,
             count
         );
-        newChartData.datasets[0].data.forEach((value: any, index: number) => {
-            if (tax !== 0 && value > 0) {
-                newChartData.datasets[0].data[index] = value + value * tax;
+        newChartData.datasets[0].data.forEach(
+            (value: number, index: number) => {
+                if (tax !== 0 && value > 0) {
+                    newChartData.datasets[0].data[index] = value + value * tax;
+                }
             }
-        });
+        );
         setChartData(newChartData);
-        console.log("updated chart data")
     }, [tax, history, totalChartData]);
 
     const parseCustomDate = (dateString: string) => {
@@ -171,7 +183,7 @@ function LineChart(props: ChartData) {
         {
             id: "backgroundColor",
             beforeDraw: (
-                chart: { ctx?: any; width?: number; height?: number },
+                chart: { ctx?: any; width: number; height: number },
                 args: any,
                 options: any
             ) => {
@@ -183,10 +195,43 @@ function LineChart(props: ChartData) {
                 ctx.restore();
             },
         },
+        {
+            id: "loadingNotice",
+            beforeDraw: (
+                chart: {
+                    config: any;
+                    ctx?: any;
+                    width: number;
+                    height: number;
+                },
+                args: any,
+                options: any
+            ) => {
+                if (chart.config._config.data.labels.length == 0) {
+                    const { ctx } = chart;
+                    console.log(ctx);
+
+                    ctx.save();
+                    ctx.font = "30px Arial";
+                    ctx.fillText(
+                        "Ladataan...",
+                        chart.width / 2 - 50,
+                        chart.height / 2
+                    );
+                    ctx.restore();
+                }
+            },
+        },
 
         {
             id: "cursorHoverVerticalLine",
-            afterDraw: (chart: { tooltip?: any; scales?: any; ctx?: any }) => {
+            afterDraw: (chart: {
+                height: number;
+                width: number;
+                tooltip?: any;
+                scales?: any;
+                ctx?: any;
+            }) => {
                 if (chart.tooltip._active && chart.tooltip._active.length) {
                     const activePoint = chart.tooltip._active[0];
                     const { ctx } = chart;
@@ -208,30 +253,55 @@ function LineChart(props: ChartData) {
         },
     ];
 
-    const calculateAverage = (hInPast:number) => {
-
+    const calculateAverage = (hInPast: number) => {
         const now = new Date();
         const ticks = totalChartData.labels;
-        let latestIndex = ticks.findIndex((timestamp:string) => new Date(timestamp) > now) -1;
+        let latestIndex =
+            ticks.findIndex((timestamp: string) => new Date(timestamp) > now) -
+            1;
         //not found
         if (latestIndex < 0) {
             return 0.0;
         }
         //console.log(latestIndex)
-        
-        let historyData = totalChartData.datasets[0].data.slice(Math.max(0, latestIndex - hInPast), latestIndex + 1);
-        let avg =  historyData.reduce((acc:number, val:number) => acc + val, 0)  / (hInPast + 1);
+
+        let historyData = totalChartData.datasets[0].data.slice(
+            Math.max(0, latestIndex - hInPast),
+            latestIndex + 1
+        );
+        let avg =
+            historyData.reduce((acc: number, val: number) => acc + val, 0) /
+            (hInPast + 1);
         return avg / 10.0;
-    }
+    };
 
     return (
         <div className="w-full">
-
             <div className="w-full flex flex-wrap justify-center mb-4">
-                <InfoBox tax={tax} description={"Hinta nyt"} price={calculateAverage(0)}/>
-                <InfoBox tax={tax} description={"Keskihinta 1pv"} price={calculateAverage(23)}/>
-                <InfoBox tax={tax} description={"Keskihinta 1vk"} price={calculateAverage(167)}/>
-                <InfoBox tax={tax} description={"Keskihinta 1kk"} price={calculateAverage(719)}/>
+                <InfoBox
+                    tax={tax}
+                    description={"Hinta nyt"}
+                    price={calculateAverage(0)}
+                    loading={totalChartData.labels.length == 0}
+                />
+                <InfoBox
+                    tax={tax}
+                    description={"Keskihinta 1pv"}
+                    price={calculateAverage(23)}
+                    loading={totalChartData.labels.length == 0}
+                />
+                <InfoBox
+                    tax={tax}
+                    description={"Keskihinta 1vk"}
+                    price={calculateAverage(167)}
+                    loading={totalChartData.labels.length == 0}
+                />
+                <InfoBox
+                    tax={tax}
+                    description={"Keskihinta 1kk"}
+                    price={calculateAverage(719)}
+                    loading={totalChartData.labels.length == 0}
+                />
             </div>
 
             <div

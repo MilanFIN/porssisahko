@@ -1,16 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import NewsList from "./newslist";
+import { Article } from "@/common/common";
 
 interface NewsProps {
-    apiSources: String[];
-    sources: String[];
-    articles: any;
+    apiSources: string[];
+    sources: string[];
+    articles: Array<Array<Article>>;
 }
 
 function News(props: NewsProps) {
     const [activeSource, setActiveSource] = useState(0);
-
 
     return (
         <div className="h-full w-full">
