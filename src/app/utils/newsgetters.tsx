@@ -1,5 +1,6 @@
 import { zeroPad } from "@/common/common";
 import cacheData from "memory-cache";
+import { revalidateTag } from "next/cache";
 
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
@@ -19,7 +20,7 @@ export const getYleContent = async (wait: boolean) => {
         const IMAGEURL =
             "https://images.cdn.yle.fi/image/upload/w_196,h_110,ar_1.7777777777777777,dpr_1,c_fill/q_auto:eco,f_auto,fl_lossy/v420/";
 
-        const response = await fetch(url, { cache: 'no-store' });
+        const response = await fetch(url, { cache: "no-store" });
         let data = await response.text();
         let results: any = [];
 
@@ -46,8 +47,7 @@ export const getYleContent = async (wait: boolean) => {
         cacheData.put(url, results, 1000 * CACHESECONDS);
 
         return results;
-    }
-    else {
+    } else {
         return [];
     }
 };
@@ -61,7 +61,7 @@ export const getHsContent = async (wait: boolean) => {
         const NEWSURL = "https://www.hs.fi/art-";
         const NEWSENDURL = ".html";
 
-        const response = await fetch(url, { cache: 'no-store' });
+        const response = await fetch(url, { cache: "no-store" });
         let data = await response.text();
         let results: any = [];
 
@@ -89,13 +89,12 @@ export const getHsContent = async (wait: boolean) => {
         cacheData.put(url, results, 1000 * CACHESECONDS);
 
         return results;
-    }
-    else {
+    } else {
         return [];
     }
 };
 
-export const getIsContent = async (wait:boolean) => {
+export const getIsContent = async (wait: boolean) => {
     const url = "https://www.is.fi/aihe/sahko/";
     const value = cacheData.get(url);
     if (value) {
@@ -153,14 +152,12 @@ export const getIsContent = async (wait:boolean) => {
 
         cacheData.put(url, results, 1000 * CACHESECONDS);
         return results;
-    }
-    else {
+    } else {
         return [];
     }
-
 };
 
-export const getIlContent = async (wait:boolean) => {
+export const getIlContent = async (wait: boolean) => {
     const url =
         "https://api.il.fi/v1/articles/search?q=s%C3%A4hk%C3%B6&limit=10&image_sizes[]=size138";
     const value = cacheData.get(url);
@@ -169,7 +166,7 @@ export const getIlContent = async (wait:boolean) => {
     } else if (wait) {
         const NEWSURL = "https://www.iltalehti.fi/";
 
-        const response = await fetch(url, { cache: 'no-store' });
+        const response = await fetch(url, { cache: "no-store" });
         let data = await response.json();
         data = data.response;
         let results: any = [];
@@ -191,11 +188,9 @@ export const getIlContent = async (wait:boolean) => {
         cacheData.put(url, results, 1000 * CACHESECONDS);
 
         return results;
-    }
-    else {
+    } else {
         return [];
     }
-
 };
 
 export const getPriceData = async () => {
@@ -218,7 +213,7 @@ export const getPriceData = async () => {
         let isoThreeMonthsAgo = threeMonthsAgo.toISOString();
 
         let source = `https://www.fingrid.fi/api/graph/dataset?variableId[]=106&start=${isoThreeMonthsAgo}&end=${isoTomorrow}`;
-        const response = await fetch(source, { cache: 'no-store' });
+        const response = await fetch(source, { cache: "no-store" });
         let data = await response.json();
 
         cacheData.put(key, data[0].Values, 1000 * CACHESECONDS);
@@ -228,74 +223,90 @@ export const getPriceData = async () => {
 };
 
 export const getDayAheadData = async (wait: boolean) => {
-    const key = "entsoe-prices";
-    const value = cacheData.get(key);
-    if (value) {
-        return value;
-    } else if (wait) {
-        let tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 2);
-        tomorrow.setHours(0, 0, 0, 0);
-        let tomorrowStamp =
-            tomorrow.getFullYear().toString() +
-            zeroPad(tomorrow.getMonth() + 1) +
-            zeroPad(tomorrow.getDate()) +
-            zeroPad(tomorrow.getHours()) +
-            zeroPad(tomorrow.getMinutes());
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 2);
+    tomorrow.setHours(0, 0, 0, 0);
+    let tomorrowStamp =
+        tomorrow.getFullYear().toString() +
+        zeroPad(tomorrow.getMonth() + 1) +
+        zeroPad(tomorrow.getDate()) +
+        zeroPad(tomorrow.getHours()) +
+        zeroPad(tomorrow.getMinutes());
 
-        let threeMonthsAgo = new Date();
-        threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
-        threeMonthsAgo.setHours(0, 0, 0, 0);
+    let threeMonthsAgo = new Date();
+    threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
+    threeMonthsAgo.setHours(0, 0, 0, 0);
 
-        let threeMonthStamp =
-            threeMonthsAgo.getFullYear().toString() +
-            zeroPad(threeMonthsAgo.getMonth() + 1) +
-            zeroPad(threeMonthsAgo.getDate()) +
-            zeroPad(threeMonthsAgo.getHours()) +
-            zeroPad(threeMonthsAgo.getMinutes());
+    let threeMonthStamp =
+        threeMonthsAgo.getFullYear().toString() +
+        zeroPad(threeMonthsAgo.getMonth() + 1) +
+        zeroPad(threeMonthsAgo.getDate()) +
+        zeroPad(threeMonthsAgo.getHours()) +
+        zeroPad(threeMonthsAgo.getMinutes());
 
-        let token = process.env.ENTSOE_SECURITY_TOKEN || "";
+    let token = process.env.ENTSOE_SECURITY_TOKEN || "";
 
-        let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
-        const response = await fetch(url, { cache: 'no-store' });
+    let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
+    let response = await fetch(url, {
+        next: {
+            revalidate: CACHESECONDS,
+            tags: ['price']
+        },
+    });
+    if (response.status != 200) {
+        return [];
+    }
+    let data = await response.text();
+
+    let jsonData = JSON.parse(
+        convert.xml2json(data, { compact: true, spaces: 4 })
+    );
+
+    //aattemp
+    let queryDate = new Date(jsonData.Publication_MarketDocument.createdDateTime._text)
+    let now = new Date();
+    let diff = Math.abs(queryDate.getTime() - now.getTime()) / 3600000;
+
+    if (diff > 1) {
+        revalidateTag('price')
+        response = await fetch(url, {
+            next: {
+                revalidate: CACHESECONDS,
+                tags: ['price']
+            },
+        });
         if (response.status != 200) {
-            cacheData.put(key, [], 1000 * CACHESECONDS);
-
             return [];
         }
-        const data = await response.text();
-
-        let jsonData = JSON.parse(
+        data = await response.text();
+    
+        jsonData = JSON.parse(
             convert.xml2json(data, { compact: true, spaces: 4 })
         );
-        let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
+    }
 
-        let timeData: any = [];
+    let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
 
-        timeSeriesData.forEach((element: any) => {
-            let period = element.Period;
-            let startTime = new Date(period.timeInterval.start._text);
-            let dataPoints = period.Point;
+    let timeData: any = [];
 
-            dataPoints.forEach((point: any) => {
-                let hoursOffset = parseInt(point.position._text) - 1;
-                let correspondingDate = new Date(startTime.getTime());
-                correspondingDate.setHours(
-                    correspondingDate.getHours() + hoursOffset
-                );
-                let price = parseFloat(point["price.amount"]._text);
-                timeData.push({
-                    Timestamp: correspondingDate.toISOString(),
-                    Value: price,
-                });
+    timeSeriesData.forEach((element: any) => {
+        let period = element.Period;
+        let startTime = new Date(period.timeInterval.start._text);
+        let dataPoints = period.Point;
+
+        dataPoints.forEach((point: any) => {
+            let hoursOffset = parseInt(point.position._text) - 1;
+            let correspondingDate = new Date(startTime.getTime());
+            correspondingDate.setHours(
+                correspondingDate.getHours() + hoursOffset
+            );
+            let price = parseFloat(point["price.amount"]._text);
+            timeData.push({
+                Timestamp: correspondingDate.toISOString(),
+                Value: price,
             });
         });
+    });
 
-        cacheData.put(key, timeData, 1000 * CACHESECONDS);
-
-        return timeData;
-    }
-    else {
-        return null;
-    }
+    return timeData;
 };
