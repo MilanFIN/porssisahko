@@ -250,7 +250,7 @@ export const getDayAheadData = async (wait: boolean) => {
     let response = await fetch(url, {
         next: {
             revalidate: CACHESECONDS,
-            tags: ['price']
+            tags: ["price"],
         },
     });
     if (response.status != 200) {
@@ -263,28 +263,29 @@ export const getDayAheadData = async (wait: boolean) => {
     );
 
     //aattemp
-    let queryDate = new Date(jsonData.Publication_MarketDocument.createdDateTime._text)
+    let queryDate = new Date(
+        jsonData.Publication_MarketDocument.createdDateTime._text
+    );
     let now = new Date();
     let diff = Math.abs(queryDate.getTime() - now.getTime()) / 3600000;
 
     if (diff > 1) {
-        revalidateTag('price')
+        revalidateTag("price");
         response = await fetch(url, {
             next: {
                 revalidate: CACHESECONDS,
-                tags: ['price']
+                tags: ["price"],
             },
         });
         if (response.status != 200) {
-            return [];
+            return { date: "", data: [] };
         }
         data = await response.text();
-    
+
         jsonData = JSON.parse(
             convert.xml2json(data, { compact: true, spaces: 4 })
         );
     }
-
     let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
 
     let timeData: any = [];
@@ -308,5 +309,8 @@ export const getDayAheadData = async (wait: boolean) => {
         });
     });
 
-    return timeData;
+    return {
+        date: jsonData.Publication_MarketDocument.createdDateTime._text,
+        data: timeData,
+    };
 };

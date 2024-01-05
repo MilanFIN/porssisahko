@@ -13,40 +13,48 @@ import {
 import LineChart from "@/components/linechart";
 import News from "@/components/news";
 
-//export const fetchCache = 'force-no-store';
-//export const dynamic = 'force-dynamic'
+interface PriceData {
+    date: string;
+    data: any;
+}
 
 export default async function Home() {
-    
     const yleArticles = await getYleContent(false);
     const hsArticles = await getHsContent(false);
     const isArticles = await getIsContent(false);
     const ilArticles = await getIlContent(false);
-    
-    const priceData = await getDayAheadData(false);
 
-    const chartData = priceData != null ? {
-        labels: priceData.map((data: any) => data.Timestamp),
-        datasets: [
-            {
-                label: "Hinta " + priceData.map((data: any) => data.Timestamp),
-                data: priceData.map((data: any) => data.Value),
-                borderColor: "black",
-                borderWidth: 2,
-            },
-        ],
-    } : 
-    {
-        labels: [],
-        datasets: [
-            {
-                label: "TBD",
-                data: [],
-                borderColor: "black",
-                borderWidth: 2,
-            },
-        ],
-    };
+    const dayAheadData = await getDayAheadData(false);
+    const priceData = dayAheadData as PriceData;
+
+    const chartData =
+        priceData.data.length != 0
+            ? {
+                  labels: priceData.data.map((data: any) => data.Timestamp),
+                  datasets: [
+                      {
+                          label:
+                              "Hinta " +
+                              priceData.data.map((data: any) => data.Timestamp),
+                          data: priceData.data.map((data: any) => data.Value),
+                          borderColor: "black",
+                          borderWidth: 2,
+                      },
+                  ],
+              }
+            : {
+                  labels: [],
+                  datasets: [
+                      {
+                          label: "TBD",
+                          data: [],
+                          borderColor: "black",
+                          borderWidth: 2,
+                      },
+                  ],
+              };
+
+    const chartDate = priceData.date != "" ? new Date(priceData.date) : null;
 
     return (
         <main className="w-full h-full bg-gradient-to-b from-yellow-100 to-yellow-200 ">
@@ -83,12 +91,12 @@ export default async function Home() {
                     </div>
                     <div className="w-full grid justify-items-center h-full">
                         <div className="w-[95%] h-full">
-                            <LineChart chartData={chartData} />
+                            <LineChart chartData={chartData} date={chartDate} />
                         </div>
                     </div>
                 </div>
 
-                <div className="xl:w-[30%] w-full h-full items-top flex">
+                <div className="xl:w-[30%] mr-[2%] w-full h-full items-top flex">
                     <div className="flex flex-wrap w-full h-full items-center justify-center align-top">
                         <h1 className="w-full h-[10%] grow text-center text-4xl my-4">
                             Aiheeseen liittyviä uutisia
@@ -96,9 +104,14 @@ export default async function Home() {
 
                         <div className="h-[600px] min-h-[0px] w-full">
                             <News
-                                articles={[yleArticles, hsArticles, ilArticles, isArticles]}
+                                articles={[
+                                    yleArticles,
+                                    hsArticles,
+                                    ilArticles,
+                                    isArticles,
+                                ]}
                                 apiSources={["yle", "hs", "il", "is"]}
-                                sources={["YLE", "HS", "IL", "IS"]}
+                                sources={["Yle", "HS", "IL", "IS"]}
                             />
                         </div>
                     </div>

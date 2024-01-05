@@ -65,6 +65,7 @@ Chart.register(
 
 interface LineChartProps {
     chartData: any;
+    date: Date | null;
 }
 
 interface PriceData {
@@ -90,6 +91,7 @@ function LineChart(props: LineChartProps) {
     );
 
     useEffect(() => {
+        /*
         const getPriceData = async () => {
             let priceData = await fetch("/api/price");
             let parsedData = (await priceData.json()) as Array<PriceData>;
@@ -112,6 +114,7 @@ function LineChart(props: LineChartProps) {
         if (totalChartData.labels.length == 0) {
             getPriceData();
         }
+        */
     }, []);
 
     useEffect(() => {
@@ -199,6 +202,7 @@ function LineChart(props: LineChartProps) {
             id: "loadingNotice",
             beforeDraw: (
                 chart: {
+                    scales: any;
                     config: any;
                     ctx?: any;
                     width: number;
@@ -207,8 +211,9 @@ function LineChart(props: LineChartProps) {
                 args: any,
                 options: any
             ) => {
+                const { ctx } = chart;
+
                 if (chart.config._config.data.labels.length == 0) {
-                    const { ctx } = chart;
                     console.log(ctx);
 
                     ctx.save();
@@ -219,6 +224,27 @@ function LineChart(props: LineChartProps) {
                         chart.height / 2
                     );
                     ctx.restore();
+                }
+                else {
+                    const totalLength = chart.config._config.data.labels.length;
+                    const now = new Date();
+                    const currentDateIndex = chart.config._config.data.labels.findIndex((timestamp: string) => new Date(timestamp) > now)
+                    const left = chart.scales.x.left;
+                    const right = chart.scales.x.right;
+                    const length = right - left;
+                    const current = left + (length * currentDateIndex / totalLength)
+                    const topY = chart.scales.y.top;
+                    const bottomY = chart.scales.y.bottom;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(current, topY);
+                    ctx.lineTo(current, bottomY);
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = "#cccc00";
+                    ctx.stroke();
+                    ctx.restore();
+
                 }
             },
         },
@@ -275,6 +301,20 @@ function LineChart(props: LineChartProps) {
         return avg / 10.0;
     };
 
+    const formatChartDate = (date: Date) => {
+        return (
+            date.getDate() +
+            "." +
+            (date.getMonth() + 1) +
+            "." +
+            date.getFullYear() +
+            " " +
+            date.getHours() +
+            ":" +
+            date.getMinutes()
+        );
+    };
+
     return (
         <div className="w-full">
             <div className="w-full flex flex-wrap justify-center mb-4">
@@ -308,6 +348,16 @@ function LineChart(props: LineChartProps) {
                 className={`chart-container 
             w-full`}
             >
+                <div className="flex mb-1">
+                    <span className="grow"></span>
+                    <span className="">
+                        {props.date != null ? (
+                            <span>
+                                Päivitetty: {formatChartDate(props.date)}
+                            </span>
+                        ) : null}
+                    </span>
+                </div>
                 <div className="flex mb-2">
                     <button
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400  ${
@@ -327,6 +377,7 @@ function LineChart(props: LineChartProps) {
                     </button>
 
                     <span className="grow"></span>
+
                     <button
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
                             history == 1 ? "bg-yellow-400" : "bg-gray-300"
