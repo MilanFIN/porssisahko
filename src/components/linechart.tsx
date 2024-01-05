@@ -214,7 +214,6 @@ function LineChart(props: LineChartProps) {
                 const { ctx } = chart;
 
                 if (chart.config._config.data.labels.length == 0) {
-                    console.log(ctx);
 
                     ctx.save();
                     ctx.font = "30px Arial";
@@ -311,7 +310,7 @@ function LineChart(props: LineChartProps) {
             " " +
             date.getHours() +
             ":" +
-            date.getMinutes()
+            zeroPad(date.getMinutes())
         );
     };
 
