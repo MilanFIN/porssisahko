@@ -30,6 +30,7 @@ import {
     Title,
     Tooltip,
     scales,
+    DatasetController,
 } from "chart.js";
 import { useEffect, useState } from "react";
 import { zeroPad } from "@/common/common";
@@ -68,9 +69,14 @@ interface LineChartProps {
     date: Date | null;
 }
 
-interface PriceData {
+interface PriceValue {
     Timestamp: string;
     Value: number;
+}
+
+interface PriceData {
+    data: Array<PriceValue>;
+    date: string;
 }
 
 interface ChartData {
@@ -81,6 +87,7 @@ interface ChartData {
 function LineChart(props: LineChartProps) {
     const [tax, setTax] = useState(0.24);
     const [history, setHistory] = useState(7);
+    const [date, setDate] = useState<Date | null>(null);
 
     const [totalChartData, setTotalChartData] = useState<ChartData>(
         JSON.parse(JSON.stringify(props.chartData))
@@ -91,30 +98,33 @@ function LineChart(props: LineChartProps) {
     );
 
     useEffect(() => {
-        /*
         const getPriceData = async () => {
             let priceData = await fetch("/api/price");
-            let parsedData = (await priceData.json()) as Array<PriceData>;
+            let parsedData = (await priceData.json()) as PriceData;
 
             const newChartData = {
-                labels: parsedData.map((data: PriceData) => data.Timestamp),
+                labels: parsedData.data.map(
+                    (data: PriceValue) => data.Timestamp
+                ),
                 datasets: [
                     {
-                        label: parsedData.map(
-                            (data: PriceData) => data.Timestamp
+                        label: parsedData.data.map(
+                            (data: PriceValue) => data.Timestamp
                         ),
-                        data: parsedData.map((data: PriceData) => data.Value),
+                        data: parsedData.data.map(
+                            (data: PriceValue) => data.Value
+                        ),
                         borderColor: "black",
                         borderWidth: 2,
                     },
                 ],
             };
             setTotalChartData(newChartData);
+            setDate(new Date(parsedData.date));
         };
         if (totalChartData.labels.length == 0) {
             getPriceData();
         }
-        */
     }, []);
 
     useEffect(() => {
@@ -214,7 +224,6 @@ function LineChart(props: LineChartProps) {
                 const { ctx } = chart;
 
                 if (chart.config._config.data.labels.length == 0) {
-
                     ctx.save();
                     ctx.font = "30px Arial";
                     ctx.fillText(
@@ -223,15 +232,26 @@ function LineChart(props: LineChartProps) {
                         chart.height / 2
                     );
                     ctx.restore();
-                }
-                else {
+                } else {
                     const totalLength = chart.config._config.data.labels.length;
                     const now = new Date();
-                    const currentDateIndex = chart.config._config.data.labels.findIndex((timestamp: string) => new Date(timestamp) > now)
+                    let nextHourIndex =
+                        chart.config._config.data.labels.findIndex(
+                            (timestamp: string) => new Date(timestamp) > now
+                        );
                     const left = chart.scales.x.left;
                     const right = chart.scales.x.right;
                     const length = right - left;
-                    const current = left + (length * currentDateIndex / totalLength)
+
+                    const nextHour = new Date(
+                        chart.config._config.data.labels.length[nextHourIndex]
+                    );
+                    //todo: fix the offset line somehow
+                    let diff = 0;//Math.abs(nextHour.getTime() - now.getTime()) / 3600000;
+                    const currentDateIndex = nextHourIndex - diff;
+
+                    const current =
+                        left + (length * currentDateIndex) / totalLength;
                     const topY = chart.scales.y.top;
                     const bottomY = chart.scales.y.bottom;
 
@@ -243,7 +263,6 @@ function LineChart(props: LineChartProps) {
                     ctx.strokeStyle = "#cccc00";
                     ctx.stroke();
                     ctx.restore();
-
                 }
             },
         },
@@ -350,10 +369,8 @@ function LineChart(props: LineChartProps) {
                 <div className="flex mb-1">
                     <span className="grow"></span>
                     <span className="">
-                        {props.date != null ? (
-                            <span>
-                                Päivitetty: {formatChartDate(props.date)}
-                            </span>
+                        {date != null ? (
+                            <span>Päivitetty: {formatChartDate(date)}</span>
                         ) : null}
                     </span>
                 </div>

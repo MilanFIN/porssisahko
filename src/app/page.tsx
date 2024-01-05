@@ -55,7 +55,6 @@ export default async function Home() {
               };
 
     const chartDate = priceData.date != "" ? new Date(priceData.date) : null;
-
     return (
         <main className="w-full h-full bg-gradient-to-b from-yellow-100 to-yellow-200 ">
             <div className="w-full h-full xl:flex min-h-screen">

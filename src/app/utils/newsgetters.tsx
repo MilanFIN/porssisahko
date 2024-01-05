@@ -223,94 +223,79 @@ export const getPriceData = async () => {
 };
 
 export const getDayAheadData = async (wait: boolean) => {
-    let tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 2);
-    tomorrow.setHours(0, 0, 0, 0);
-    let tomorrowStamp =
-        tomorrow.getFullYear().toString() +
-        zeroPad(tomorrow.getMonth() + 1) +
-        zeroPad(tomorrow.getDate()) +
-        zeroPad(tomorrow.getHours()) +
-        zeroPad(tomorrow.getMinutes());
+    const key = "entsoe-prices";
+    const value = cacheData.get(key);
+    if (value) {
+        return value;
+    } else if (!wait) {
+        return { date: null, data: [] };
+    } else {
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 2);
+        tomorrow.setHours(0, 0, 0, 0);
+        let tomorrowStamp =
+            tomorrow.getFullYear().toString() +
+            zeroPad(tomorrow.getMonth() + 1) +
+            zeroPad(tomorrow.getDate()) +
+            zeroPad(tomorrow.getHours()) +
+            zeroPad(tomorrow.getMinutes());
 
-    let threeMonthsAgo = new Date();
-    threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
-    threeMonthsAgo.setHours(0, 0, 0, 0);
+        let threeMonthsAgo = new Date();
+        threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
+        threeMonthsAgo.setHours(0, 0, 0, 0);
 
-    let threeMonthStamp =
-        threeMonthsAgo.getFullYear().toString() +
-        zeroPad(threeMonthsAgo.getMonth() + 1) +
-        zeroPad(threeMonthsAgo.getDate()) +
-        zeroPad(threeMonthsAgo.getHours()) +
-        zeroPad(threeMonthsAgo.getMinutes());
+        let threeMonthStamp =
+            threeMonthsAgo.getFullYear().toString() +
+            zeroPad(threeMonthsAgo.getMonth() + 1) +
+            zeroPad(threeMonthsAgo.getDate()) +
+            zeroPad(threeMonthsAgo.getHours()) +
+            zeroPad(threeMonthsAgo.getMinutes());
 
-    let token = process.env.ENTSOE_SECURITY_TOKEN || "";
+        let token = process.env.ENTSOE_SECURITY_TOKEN || "";
 
-    let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
-    let response = await fetch(url, {
-        next: {
-            revalidate: CACHESECONDS,
-            tags: ["price"],
-        },
-    });
-    if (response.status != 200) {
-        return [];
-    }
-    let data = await response.text();
-
-    let jsonData = JSON.parse(
-        convert.xml2json(data, { compact: true, spaces: 4 })
-    );
-
-    //aattemp
-    let queryDate = new Date(
-        jsonData.Publication_MarketDocument.createdDateTime._text
-    );
-    let now = new Date();
-    let diff = Math.abs(queryDate.getTime() - now.getTime()) / 3600000;
-
-    if (diff > 1) {
-        revalidateTag("price");
-        response = await fetch(url, {
-            next: {
-                revalidate: CACHESECONDS,
-                tags: ["price"],
-            },
+        let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
+        let response = await fetch(url, {
+            cache: "no-cache",
         });
         if (response.status != 200) {
             return { date: "", data: [] };
         }
-        data = await response.text();
+        let data = await response.text();
 
-        jsonData = JSON.parse(
+        let jsonData = JSON.parse(
             convert.xml2json(data, { compact: true, spaces: 4 })
         );
-    }
-    let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
 
-    let timeData: any = [];
+        let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
 
-    timeSeriesData.forEach((element: any) => {
-        let period = element.Period;
-        let startTime = new Date(period.timeInterval.start._text);
-        let dataPoints = period.Point;
+        let timeData: any = [];
 
-        dataPoints.forEach((point: any) => {
-            let hoursOffset = parseInt(point.position._text) - 1;
-            let correspondingDate = new Date(startTime.getTime());
-            correspondingDate.setHours(
-                correspondingDate.getHours() + hoursOffset
-            );
-            let price = parseFloat(point["price.amount"]._text);
-            timeData.push({
-                Timestamp: correspondingDate.toISOString(),
-                Value: price,
+        timeSeriesData.forEach((element: any) => {
+            let period = element.Period;
+            let startTime = new Date(period.timeInterval.start._text);
+            let dataPoints = period.Point;
+
+            dataPoints.forEach((point: any) => {
+                let hoursOffset = parseInt(point.position._text) - 1;
+                let correspondingDate = new Date(startTime.getTime());
+                correspondingDate.setHours(
+                    correspondingDate.getHours() + hoursOffset
+                );
+                let price = parseFloat(point["price.amount"]._text);
+                timeData.push({
+                    Timestamp: correspondingDate.toISOString(),
+                    Value: price,
+                });
             });
         });
-    });
 
-    return {
-        date: jsonData.Publication_MarketDocument.createdDateTime._text,
-        data: timeData,
-    };
+        const result = {
+            date: jsonData.Publication_MarketDocument.createdDateTime._text,
+            data: timeData,
+        };
+
+        cacheData.put(key, result, 1000 * CACHESECONDS);
+
+        return result;
+    }
 };
