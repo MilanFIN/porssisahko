@@ -3,15 +3,16 @@ import { useEffect, useState } from "react";
 
 import NewsList from "@/components/newslist";
 import {
-    getDayAheadData,
     getHsContent,
     getIlContent,
     getIsContent,
-    getPriceData,
     getYleContent,
-} from "./utils/newsgetters";
+    getDayAheadData
+} from "./actions"
 import LineChart from "@/components/linechart";
 import News from "@/components/news";
+
+//todo: add suspense or some other loading indicator to newslist
 
 interface PriceData {
     date: string;

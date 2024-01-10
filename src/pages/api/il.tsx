@@ -1,4 +1,4 @@
-import { getIlContent } from "@/app/utils/newsgetters";
+import { getIlContent } from "@/app/actions";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const il = async (req: NextApiRequest, res: NextApiResponse) => {

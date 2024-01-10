@@ -35,6 +35,7 @@ import {
 import { useEffect, useState } from "react";
 import { zeroPad } from "@/common/common";
 import { InfoBox } from "./infobox";
+import { getDayAheadData } from "@/app/actions";
 
 Chart.register(
     ArcElement,
@@ -99,8 +100,9 @@ function LineChart(props: LineChartProps) {
 
     useEffect(() => {
         const getPriceData = async () => {
-            let priceData = await fetch("/api/price");
-            let parsedData = (await priceData.json()) as PriceData;
+
+            let priceData = await getDayAheadData(true)
+            let parsedData = priceData as PriceData;
 
             const newChartData = {
                 labels: parsedData.data.map(

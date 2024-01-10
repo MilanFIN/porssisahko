@@ -1,4 +1,4 @@
-import { getHsContent } from "@/app/utils/newsgetters";
+import { getHsContent } from "@/app/actions";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const hs = async (req: NextApiRequest, res: NextApiResponse) => {

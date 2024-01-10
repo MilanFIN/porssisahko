@@ -1,3 +1,5 @@
+"use server"
+
 import { zeroPad } from "@/common/common";
 import cacheData from "memory-cache";
 import { revalidateTag } from "next/cache";
@@ -6,9 +8,25 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 var convert = require("xml-js");
 
-//should make cache revalidation work
-export const dynamic = "force-dynamic";
 const CACHESECONDS = 3600;
+
+export const getNews = async (type: string) => {
+	if (type == "yle") {
+		return getYleContent(true);
+	}
+	else if (type == "is") {
+		return getIsContent(true);
+	}
+	else if (type == "il") {
+		return getIlContent(true);
+	}
+	else if (type == "hs") {
+		return getHsContent(true);
+	}
+	else {
+		return []
+	}
+}
 
 export const getYleContent = async (wait: boolean) => {
     const url = "https://yle.fi/uutiset/18-205950";
@@ -190,35 +208,6 @@ export const getIlContent = async (wait: boolean) => {
         return results;
     } else {
         return [];
-    }
-};
-
-export const getPriceData = async () => {
-    const key = "fingrid-prices";
-    const value = cacheData.get(key);
-    if (value) {
-        return value;
-    } else {
-        var currentDate = new Date();
-        // Get tomorrow's date
-        let tomorrow = new Date(currentDate);
-        tomorrow.setDate(currentDate.getDate() + 1);
-        tomorrow.setHours(23, 59, 59, 999); // Set to the end of the day
-        let isoTomorrow = tomorrow.toISOString();
-
-        let threeMonthsAgo = new Date(
-            currentDate.getTime() - 90 * 24 * 60 * 60 * 1000
-        );
-        threeMonthsAgo.setHours(0, 0, 0, 0);
-        let isoThreeMonthsAgo = threeMonthsAgo.toISOString();
-
-        let source = `https://www.fingrid.fi/api/graph/dataset?variableId[]=106&start=${isoThreeMonthsAgo}&end=${isoTomorrow}`;
-        const response = await fetch(source, { cache: "no-store" });
-        let data = await response.json();
-
-        cacheData.put(key, data[0].Values, 1000 * CACHESECONDS);
-
-        return data[0].Values;
     }
 };
 

@@ -1,4 +1,4 @@
-import { getIsContent } from "@/app/utils/newsgetters";
+import { getIsContent } from "@/app/actions";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const IS = async (req: NextApiRequest, res: NextApiResponse) => {

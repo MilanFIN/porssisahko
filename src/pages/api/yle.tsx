@@ -1,4 +1,4 @@
-import { getYleContent } from "@/app/utils/newsgetters";
+import { getYleContent } from "@/app/actions";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const yle = async (req: NextApiRequest, res: NextApiResponse) => {

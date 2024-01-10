@@ -1,4 +1,4 @@
-import { getDayAheadData } from "@/app/utils/newsgetters";
+import { getDayAheadData } from "@/app/actions";
 import { NextApiRequest, NextApiResponse } from "next";
 var convert = require("xml-js");
 

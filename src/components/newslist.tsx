@@ -1,5 +1,6 @@
 "use client";
 
+import { getNews } from "@/app/actions";
 import {zeroPad, Article  } from "@/common/common";
 import React, { useEffect, useState } from "react";
 
@@ -23,9 +24,7 @@ function NewsList(props: NewsListProps) {
             else {
                 setArticles([]);
                 let source = props.apiSource;
-
-                let newArticles = await fetch("/api/"+props.apiSource);
-                let parsedArticles = await newArticles.json();
+                let parsedArticles = await getNews(props.apiSource);
 
                 if (props.apiSource == source) {
                     setArticles(parsedArticles);
