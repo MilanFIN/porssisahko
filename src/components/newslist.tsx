@@ -79,7 +79,7 @@ function NewsList(props: NewsListProps) {
     };
 
     return (
-        <div className="h-full w-full bg-gray-800 p-2">
+        <div className="h-full w-full bg-gray-800 p-2 rounded-b-lg">
             <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
                 {articles.length != 0 ? (
                     articles.slice(0, 20).map((item: Article) => (

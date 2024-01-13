@@ -13,7 +13,7 @@ function News(props: NewsProps) {
     const [activeSource, setActiveSource] = useState(0);
 
     return (
-        <div className="h-full w-full rounded-lg pb-8 transparent">
+        <div className="h-full w-full rounded-lg mt-2 transparent">
             <div className="flex w-full justify-center rounded-t-xl">
                 {props.sources.map((source: String, index: number) => (
                     <button
