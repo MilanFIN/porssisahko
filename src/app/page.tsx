@@ -13,6 +13,8 @@ import LineChart from "@/components/linechart";
 import News from "@/components/news";
 import LineChartWrapper from "@/components/linechartwrapper";
 import { LineChartSkeleton } from "@/components/linechartskeleton";
+import { NewsWrapper } from "@/components/newswrapper";
+import { NewsSkeleton } from "@/components/newsskeleton";
 
 //todo: add suspense or some other loading indicator to newslist
 
@@ -22,11 +24,6 @@ interface PriceData {
 }
 
 export default async function Home() {
-    const yleArticles = await getYleContent(false);
-    const hsArticles = await getHsContent(false);
-    const isArticles = await getIsContent(false);
-    const ilArticles = await getIlContent(false);
-
     return (
         <main
             className="w-full justify-items-center grid 
@@ -68,8 +65,8 @@ export default async function Home() {
                         </div>
                         <div className="w-full grid justify-items-center  ">
                             <div className="w-[95%]">
-                                <Suspense fallback={<LineChartSkeleton/>}>
-                                    <LineChartWrapper/>
+                                <Suspense fallback={<LineChartSkeleton />}>
+                                    <LineChartWrapper />
                                 </Suspense>
                             </div>
                         </div>
@@ -81,16 +78,10 @@ export default async function Home() {
                         </h2>
 
                         <div className="h-[600px] w-full rounded-lg">
-                            <News
-                                articles={[
-                                    yleArticles,
-                                    hsArticles,
-                                    ilArticles,
-                                    isArticles,
-                                ]}
-                                apiSources={["yle", "hs", "il", "is"]}
-                                sources={["Yle", "HS", "IL", "IS"]}
-                            />
+                            <Suspense fallback={<NewsSkeleton />}>
+                                <NewsWrapper />
+                            </Suspense>
+
                         </div>
                     </div>
                 </div>

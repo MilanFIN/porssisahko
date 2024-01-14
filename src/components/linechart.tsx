@@ -211,7 +211,7 @@ function LineChart(props: LineChartProps) {
             },
         },
         {
-            id: "loadingNotice",
+            id: "currentDay",
             beforeDraw: (
                 chart: {
                     scales: any;
@@ -224,48 +224,36 @@ function LineChart(props: LineChartProps) {
                 options: any
             ) => {
                 const { ctx } = chart;
-
-                if (chart.config._config.data.labels.length == 0) {
-                    ctx.save();
-                    ctx.font = "30px Arial";
-                    ctx.fillText(
-                        "Ladataan...",
-                        chart.width / 2 - 50,
-                        chart.height / 2
+                const totalLength = chart.config._config.data.labels.length;
+                const now = new Date();
+                let nextHourIndex =
+                    chart.config._config.data.labels.findIndex(
+                        (timestamp: string) => new Date(timestamp) > now
                     );
-                    ctx.restore();
-                } else {
-                    const totalLength = chart.config._config.data.labels.length;
-                    const now = new Date();
-                    let nextHourIndex =
-                        chart.config._config.data.labels.findIndex(
-                            (timestamp: string) => new Date(timestamp) > now
-                        );
-                    const left = chart.scales.x.left;
-                    const right = chart.scales.x.right;
-                    const length = right - left;
+                const left = chart.scales.x.left;
+                const right = chart.scales.x.right;
+                const length = right - left;
 
-                    const nextHour = new Date(
-                        chart.config._config.data.labels.length[nextHourIndex]
-                    );
-                    //todo: fix the offset line somehow
-                    let diff = 0;//Math.abs(nextHour.getTime() - now.getTime()) / 3600000;
-                    const currentDateIndex = nextHourIndex - diff;
+                const nextHour = new Date(
+                    chart.config._config.data.labels.length[nextHourIndex]
+                );
+                //todo: fix the offset line somehow
+                let diff = 0;//Math.abs(nextHour.getTime() - now.getTime()) / 3600000;
+                const currentDateIndex = nextHourIndex - diff;
 
-                    const current =
-                        left + (length * currentDateIndex) / totalLength;
-                    const topY = chart.scales.y.top;
-                    const bottomY = chart.scales.y.bottom;
+                const current =
+                    left + (length * currentDateIndex) / totalLength;
+                const topY = chart.scales.y.top;
+                const bottomY = chart.scales.y.bottom;
 
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.moveTo(current, topY);
-                    ctx.lineTo(current, bottomY);
-                    ctx.lineWidth = 3;
-                    ctx.strokeStyle = "#cccc00";
-                    ctx.stroke();
-                    ctx.restore();
-                }
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(current, topY);
+                ctx.lineTo(current, bottomY);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#cccc00";
+                ctx.stroke();
+                ctx.restore();
             },
         },
 
