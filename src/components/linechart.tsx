@@ -336,8 +336,8 @@ function LineChart(props: LineChartProps) {
     };
 
     return (
-        <div className="w-full">
-            <div className="w-full flex flex-wrap justify-center mb-4">
+        <div className=" text-black">
+            <div className="flex flex-wrap justify-center mb-4">
                 <InfoBox
                     tax={tax}
                     description={"Hinta nyt"}
@@ -366,9 +366,9 @@ function LineChart(props: LineChartProps) {
 
             <div
                 className={`chart-container 
-            w-full`}
+            `}
             >
-                <div className="flex mb-1">
+                <div className="flex mb-1 text-white">
                     <span className="grow"></span>
                     <span className="">
                         {date != null ? (

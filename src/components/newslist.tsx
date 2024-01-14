@@ -1,9 +1,8 @@
 "use client";
 
 import { getNews } from "@/app/actions";
-import {zeroPad, Article  } from "@/common/common";
-import React, { useEffect, useState } from "react";
-
+import { zeroPad, Article } from "@/common/common";
+import React, { ReactNode, useEffect, useState } from "react";
 
 interface NewsListProps {
     apiSource: string;
@@ -11,31 +10,56 @@ interface NewsListProps {
     articles: Array<Article>;
 }
 
-function NewsList(props: NewsListProps) {
 
+function ArticleSkeleton() {
+    return (
+        <li
+        key={"loadingItem"}
+        className="w-full mb-2 bg-zinc-600 rounded-lg p-2 "
+    >
+        <img
+            className=" h-[100px] flex-none object-cover rounded-lg mr-2"
+        ></img>
+        <div className=" grow">
+            <span className="w-full font-bold"></span>
+            <br />
+            <span className="w-full"></span>
+        </div>
+    </li>
+    )
+}
+
+function NewsSkeleton() {
+    return (
+        <div>
+            <ArticleSkeleton/>
+            <ArticleSkeleton/>
+            <ArticleSkeleton/>
+            <ArticleSkeleton/>
+
+        </div>
+    )
+}
+
+function NewsList(props: NewsListProps) {
     const [articles, setArticles] = useState<Array<Article>>([]);
 
     useEffect(() => {
-
         const getArticles = async () => {
             if (props.articles.length != 0) {
-                setArticles(props.articles)
-            }
-            else {
+                setArticles(props.articles);
+            } else {
                 setArticles([]);
                 let source = props.apiSource;
                 let parsedArticles = await getNews(props.apiSource);
 
                 if (props.apiSource == source) {
                     setArticles(parsedArticles);
-
                 }
             }
-    
-        }
+        };
         getArticles();
-    }, [props.apiSource])
-
+    }, [props.apiSource]);
 
     const formatDate = (articleDate: Date) => {
         if (Number.isNaN(articleDate.getDate())) {
@@ -55,31 +79,36 @@ function NewsList(props: NewsListProps) {
     };
 
     return (
-        <div className="h-full w-full bg-gray-300 p-2">
+        <div className="h-full w-full bg-zinc-700 p-2 rounded-b-lg">
             <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
-                {articles.length != 0 ? articles.slice(0, 20).map((item: Article) => (
-                    <li
-                        key={item.header}
-                        className="w-full mb-2 bg-gray-100 rounded-lg p-2 hover:bg-yellow-200"
-                    >
-                        <a className="w-full flex " href={item.href}>
-                            <img
-                                className=" h-[100px] flex-none object-cover rounded-lg mr-2" //w-[177px]
-                                src={item.image}
-                            ></img>
-                            <div className=" grow">
-                                <span className="w-full font-bold">
-                                    {item.header}
-                                </span>
-                                <br />
-                                <span className="w-full">
-                                    {formatDate(new Date(item.date))}
-                                </span>
-                            </div>
-                        </a>
-                    </li>
-                ))
-            : null}
+                {articles.length != 0 ? (
+                    articles.slice(0, 20).map((item: Article) => (
+                        <li
+                            key={item.header}
+                            className="w-full mb-2 bg-zinc-600 rounded-lg p-2 hover:bg-yellow-400 text-white hover:text-black"
+                        >
+                            <a className="w-full flex " href={item.href}>
+                                <img
+                                    className=" h-[100px] flex-none object-cover rounded-lg mr-2" //w-[177px]
+                                    src={item.image}
+                                ></img>
+                                <div className=" grow">
+                                    <span className="w-full font-bold">
+                                        {item.header}
+                                    </span>
+                                    <br />
+                                    <span className="w-full">
+                                        {formatDate(new Date(item.date))}
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                    ))
+                ) : (
+
+                    <NewsSkeleton/>     
+               
+                )}
             </ul>
         </div>
     );
