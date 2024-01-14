@@ -13,3 +13,9 @@ export const zeroPad = function (value: number) {
 	}
 	return strValue;
 };
+
+
+export interface PriceData {
+    date: string;
+    data: any;
+}

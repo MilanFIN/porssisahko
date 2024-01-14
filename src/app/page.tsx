@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import NewsList from "@/components/newslist";
 import {
@@ -11,6 +11,8 @@ import {
 } from "./actions";
 import LineChart from "@/components/linechart";
 import News from "@/components/news";
+import LineChartWrapper from "@/components/linechartwrapper";
+import { LineChartSkeleton } from "@/components/linechartskeleton";
 
 //todo: add suspense or some other loading indicator to newslist
 
@@ -25,37 +27,6 @@ export default async function Home() {
     const isArticles = await getIsContent(false);
     const ilArticles = await getIlContent(false);
 
-    const dayAheadData = await getDayAheadData(false);
-    const priceData = dayAheadData as PriceData;
-
-    const chartData =
-        priceData.data.length != 0
-            ? {
-                  labels: priceData.data.map((data: any) => data.Timestamp),
-                  datasets: [
-                      {
-                          label:
-                              "Hinta " +
-                              priceData.data.map((data: any) => data.Timestamp),
-                          data: priceData.data.map((data: any) => data.Value),
-                          borderColor: "black",
-                          borderWidth: 2,
-                      },
-                  ],
-              }
-            : {
-                  labels: [],
-                  datasets: [
-                      {
-                          label: "TBD",
-                          data: [],
-                          borderColor: "black",
-                          borderWidth: 2,
-                      },
-                  ],
-              };
-
-    const chartDate = priceData.date != "" ? new Date(priceData.date) : null;
     return (
         <main
             className="w-full justify-items-center grid 
@@ -96,11 +67,10 @@ export default async function Home() {
                             </div>
                         </div>
                         <div className="w-full grid justify-items-center  ">
-                            <div className="w-[95%] ">
-                                <LineChart
-                                    chartData={chartData}
-                                    date={chartDate}
-                                />
+                            <div className="w-[95%]">
+                                <Suspense fallback={<LineChartSkeleton/>}>
+                                    <LineChartWrapper/>
+                                </Suspense>
                             </div>
                         </div>
                     </div>
