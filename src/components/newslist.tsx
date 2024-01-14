@@ -15,7 +15,7 @@ function ArticleSkeleton() {
     return (
         <li
         key={"loadingItem"}
-        className="w-full mb-2 bg-gray-700 rounded-lg p-2 "
+        className="w-full mb-2 bg-zinc-600 rounded-lg p-2 "
     >
         <img
             className=" h-[100px] flex-none object-cover rounded-lg mr-2"
@@ -79,13 +79,13 @@ function NewsList(props: NewsListProps) {
     };
 
     return (
-        <div className="h-full w-full bg-gray-800 p-2 rounded-b-lg">
+        <div className="h-full w-full bg-zinc-700 p-2 rounded-b-lg">
             <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
                 {articles.length != 0 ? (
                     articles.slice(0, 20).map((item: Article) => (
                         <li
                             key={item.header}
-                            className="w-full mb-2 bg-gray-700 rounded-lg p-2 hover:bg-yellow-400 text-white hover:text-black"
+                            className="w-full mb-2 bg-zinc-600 rounded-lg p-2 hover:bg-yellow-400 text-white hover:text-black"
                         >
                             <a className="w-full flex " href={item.href}>
                                 <img

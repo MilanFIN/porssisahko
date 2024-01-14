@@ -21,7 +21,7 @@ function News(props: NewsProps) {
                         className={`rounded-t-lg grow text-lg  hover:text-black hover:bg-yellow-400 text-center h-12 ${
                             index == activeSource
                                 ? "bg-yellow-400 text-black"
-                                : "bg-gray-800 text-white "
+                                : "bg-zinc-700 text-white "
                         }`}
                         onClick={() => setActiveSource(index)}
                     >
