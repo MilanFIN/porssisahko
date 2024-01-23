@@ -100,8 +100,7 @@ function LineChart(props: LineChartProps) {
 
     useEffect(() => {
         const getPriceData = async () => {
-
-            let priceData = await getDayAheadData(true)
+            let priceData = await getDayAheadData(true);
             let parsedData = priceData as PriceData;
 
             const newChartData = {
@@ -226,10 +225,9 @@ function LineChart(props: LineChartProps) {
                 const { ctx } = chart;
                 const totalLength = chart.config._config.data.labels.length;
                 const now = new Date();
-                let nextHourIndex =
-                    chart.config._config.data.labels.findIndex(
-                        (timestamp: string) => new Date(timestamp) > now
-                    );
+                let nextHourIndex = chart.config._config.data.labels.findIndex(
+                    (timestamp: string) => new Date(timestamp) > now
+                );
                 const left = chart.scales.x.left;
                 const right = chart.scales.x.right;
                 const length = right - left;
@@ -238,7 +236,7 @@ function LineChart(props: LineChartProps) {
                     chart.config._config.data.labels.length[nextHourIndex]
                 );
                 //todo: fix the offset line somehow
-                let diff = 0;//Math.abs(nextHour.getTime() - now.getTime()) / 3600000;
+                let diff = 0; //Math.abs(nextHour.getTime() - now.getTime()) / 3600000;
                 const currentDateIndex = nextHourIndex - diff;
 
                 const current =
@@ -281,6 +279,33 @@ function LineChart(props: LineChartProps) {
                     ctx.lineWidth = 2;
                     ctx.strokeStyle = "black";
                     ctx.stroke();
+                    ctx.restore();
+                }
+            },
+        },
+        {
+            id: "loadingNotice",
+            beforeDraw: (
+                chart: {
+                    config: any;
+                    ctx?: any;
+                    width: number;
+                    height: number;
+                },
+                args: any,
+                options: any
+            ) => {
+                if (chart.config._config.data.labels.length == 0) {
+                    const { ctx } = chart;
+                    console.log(ctx);
+
+                    ctx.save();
+                    ctx.font = "30px Arial";
+                    ctx.fillText(
+                        "Ladataan...",
+                        chart.width / 2 - 50,
+                        chart.height / 2
+                    );
                     ctx.restore();
                 }
             },

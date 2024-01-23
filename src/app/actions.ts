@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { zeroPad } from "@/common/common";
 import cacheData from "memory-cache";
@@ -11,22 +11,18 @@ var convert = require("xml-js");
 const CACHESECONDS = 3600;
 
 export const getNews = async (type: string) => {
-	if (type == "yle") {
-		return getYleContent(true);
-	}
-	else if (type == "is") {
-		return getIsContent(true);
-	}
-	else if (type == "il") {
-		return getIlContent(true);
-	}
-	else if (type == "hs") {
-		return getHsContent(true);
-	}
-	else {
-		return []
-	}
-}
+    if (type == "yle") {
+        return getYleContent(true);
+    } else if (type == "is") {
+        return getIsContent(true);
+    } else if (type == "il") {
+        return getIlContent(true);
+    } else if (type == "hs") {
+        return getHsContent(true);
+    } else {
+        return [];
+    }
+};
 
 export const getYleContent = async (wait: boolean) => {
     const url = "https://yle.fi/uutiset/18-205950";
@@ -229,20 +225,20 @@ export const getDayAheadData = async (wait: boolean) => {
             zeroPad(tomorrow.getHours()) +
             zeroPad(tomorrow.getMinutes());
 
-        let threeMonthsAgo = new Date();
-        threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
-        threeMonthsAgo.setHours(0, 0, 0, 0);
+        let oneMonthAgo = new Date();
+        oneMonthAgo.setDate(oneMonthAgo.getDate() - 90);
+        oneMonthAgo.setHours(0, 0, 0, 0);
 
-        let threeMonthStamp =
-            threeMonthsAgo.getFullYear().toString() +
-            zeroPad(threeMonthsAgo.getMonth() + 1) +
-            zeroPad(threeMonthsAgo.getDate()) +
-            zeroPad(threeMonthsAgo.getHours()) +
-            zeroPad(threeMonthsAgo.getMinutes());
+        let oneMonthStamp =
+            oneMonthAgo.getFullYear().toString() +
+            zeroPad(oneMonthAgo.getMonth() + 1) +
+            zeroPad(oneMonthAgo.getDate()) +
+            zeroPad(oneMonthAgo.getHours()) +
+            zeroPad(oneMonthAgo.getMinutes());
 
         let token = process.env.ENTSOE_SECURITY_TOKEN || "";
 
-        let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${threeMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
+        let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${oneMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
         let response = await fetch(url, {
             cache: "no-cache",
         });

@@ -2,11 +2,8 @@ import { getDayAheadData } from "@/app/actions";
 import LineChart from "./linechart";
 import { PriceData } from "@/common/common";
 
-
-
 async function LineChartWrapper() {
-
-    const dayAheadData = await getDayAheadData(true);
+    const dayAheadData = await getDayAheadData(false);
     const priceData = dayAheadData as PriceData;
 
     const chartData =
@@ -38,11 +35,7 @@ async function LineChartWrapper() {
 
     const chartDate = priceData.date != "" ? new Date(priceData.date) : null;
 
-
-	return (
-		<LineChart chartData={chartData} date={chartDate} />
-	)
-
+    return <LineChart chartData={chartData} date={chartDate} />;
 }
 
 export default LineChartWrapper;

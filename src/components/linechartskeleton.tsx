@@ -57,7 +57,7 @@ export async function LineChartSkeleton() {
                         3kk
                     </button>
                 </div>
-            <div className="w-full text-center text-white">Ladataan...</div>
+                <div className="w-full text-center text-white">Ladataan...</div>
             </div>
         </div>
     );
