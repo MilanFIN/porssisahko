@@ -17,13 +17,11 @@ import { NewsWrapper } from "@/components/newswrapper";
 import { NewsSkeleton } from "@/components/newsskeleton";
 import Link from "next/link";
 
-
 export default async function Home() {
     return (
         <main
             className="w-full justify-items-center grid 
-            bg-gradient-to-b from-amber-200 to-amber-100
-            "
+                        bg-zinc-800"
         >
             <header className="sticky top-0 grid h-16 justify-items-center w-full bg-zinc-900 text-white">
                 <h1 className="xl:max-w-[1300px] px-2 py-3 align-middle h-16 w-full text-2xl font-semibold">
@@ -64,9 +62,7 @@ export default async function Home() {
                         </div>
                         <div className="w-full grid justify-items-center  ">
                             <div className="w-[95%]">
-                                <Suspense fallback={<LineChartSkeleton />}>
-                                    <LineChartWrapper />
-                                </Suspense>
+                                <LineChartWrapper />
                             </div>
                         </div>
                     </div>

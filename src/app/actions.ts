@@ -239,48 +239,60 @@ export const getDayAheadData = async (wait: boolean) => {
         let token = process.env.ENTSOE_SECURITY_TOKEN || "";
 
         let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${oneMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
-        let response = await fetch(url, {
-            cache: "no-cache",
-        });
-        if (response.status != 200) {
-            return { date: "", data: [] };
-        }
-        let data = await response.text();
+        try {
+            var response = await fetch(url, {
+                cache: "no-cache",
+            })
 
-        let jsonData = JSON.parse(
-            convert.xml2json(data, { compact: true, spaces: 4 })
-        );
+            if (response.status != 200) {
+                return { error: "Failed to fetch price data" };
+            }
+            let data = await response.text();
 
-        let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
+            let jsonData = JSON.parse(
+                convert.xml2json(data, { compact: true, spaces: 4 })
+            );
 
-        let timeData: any = [];
+            let timeSeriesData =
+                jsonData.Publication_MarketDocument.TimeSeries;
 
-        timeSeriesData.forEach((element: any) => {
-            let period = element.Period;
-            let startTime = new Date(period.timeInterval.start._text);
-            let dataPoints = period.Point;
+            let timeData: any = [];
 
-            dataPoints.forEach((point: any) => {
-                let hoursOffset = parseInt(point.position._text) - 1;
-                let correspondingDate = new Date(startTime.getTime());
-                correspondingDate.setHours(
-                    correspondingDate.getHours() + hoursOffset
-                );
-                let price = parseFloat(point["price.amount"]._text);
-                timeData.push({
-                    Timestamp: correspondingDate.toISOString(),
-                    Value: price,
+            timeSeriesData.forEach((element: any) => {
+                let period = element.Period;
+                let startTime = new Date(period.timeInterval.start._text);
+                let dataPoints = period.Point;
+
+                dataPoints.forEach((point: any) => {
+                    let hoursOffset = parseInt(point.position._text) - 1;
+                    let correspondingDate = new Date(startTime.getTime());
+                    correspondingDate.setHours(
+                        correspondingDate.getHours() + hoursOffset
+                    );
+                    let price = parseFloat(point["price.amount"]._text);
+                    timeData.push({
+                        Timestamp: correspondingDate.toISOString(),
+                        Value: price,
+                    });
                 });
             });
-        });
 
-        const result = {
-            date: jsonData.Publication_MarketDocument.createdDateTime._text,
-            data: timeData,
-        };
+            const result = {
+                date: jsonData.Publication_MarketDocument.createdDateTime
+                    ._text,
+                data: timeData,
+            };
 
-        cacheData.put(key, result, 1000 * CACHESECONDS);
+            cacheData.put(key, result, 1000 * CACHESECONDS);
 
-        return result;
+            return result;
+
+        }
+        catch (e) {
+            return { error: "Failed to fetch price data" };
+        }
+
+
+
     }
 };

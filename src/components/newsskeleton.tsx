@@ -1,7 +1,7 @@
-function ArticleSkeleton() {
+function ArticleSkeleton(props: {keyIter: string}) {
     return (
         <li
-            key={"loadingItem"}
+            key={"loadingItem" + props.keyIter}
             className="w-full mb-2 bg-zinc-600 rounded-lg p-2 "
         >
             <img className=" h-[100px] flex-none object-cover rounded-lg mr-2"></img>
@@ -18,10 +18,10 @@ function NewsListSkeleton() {
     return (
         <div className="h-full w-full bg-zinc-700 p-2 rounded-b-lg">
             <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
-                <ArticleSkeleton />
-                <ArticleSkeleton />
-                <ArticleSkeleton />
-                <ArticleSkeleton />
+                <ArticleSkeleton keyIter={"1"}/>
+                <ArticleSkeleton keyIter={"2"} />
+                <ArticleSkeleton keyIter={"3"} />
+                <ArticleSkeleton keyIter={"4"} />
             </ul>
         </div>
     );

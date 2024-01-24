@@ -78,6 +78,7 @@ interface PriceValue {
 interface PriceData {
     data: Array<PriceValue>;
     date: string;
+    error: string;
 }
 
 interface ChartData {
@@ -86,9 +87,9 @@ interface ChartData {
 }
 
 function LineChart(props: LineChartProps) {
+    const [fetchError, setFetchError] = useState("");
     const [tax, setTax] = useState(0.24);
     const [history, setHistory] = useState(7);
-    const [date, setDate] = useState<Date | null>(null);
 
     const [totalChartData, setTotalChartData] = useState<ChartData>(
         JSON.parse(JSON.stringify(props.chartData))
@@ -100,28 +101,36 @@ function LineChart(props: LineChartProps) {
 
     useEffect(() => {
         const getPriceData = async () => {
-            let priceData = await getDayAheadData(true);
-            let parsedData = priceData as PriceData;
+            let priceData: PriceData;
+            try {
+                priceData = await getDayAheadData(true);
+                if (priceData.error) {
+                    setFetchError(priceData.error);
+                } else {
+                    let parsedData = priceData as PriceData;
 
-            const newChartData = {
-                labels: parsedData.data.map(
-                    (data: PriceValue) => data.Timestamp
-                ),
-                datasets: [
-                    {
-                        label: parsedData.data.map(
+                    const newChartData = {
+                        labels: parsedData.data.map(
                             (data: PriceValue) => data.Timestamp
                         ),
-                        data: parsedData.data.map(
-                            (data: PriceValue) => data.Value
-                        ),
-                        borderColor: "black",
-                        borderWidth: 2,
-                    },
-                ],
-            };
-            setTotalChartData(newChartData);
-            setDate(new Date(parsedData.date));
+                        datasets: [
+                            {
+                                label: parsedData.data.map(
+                                    (data: PriceValue) => data.Timestamp
+                                ),
+                                data: parsedData.data.map(
+                                    (data: PriceValue) => data.Value
+                                ),
+                                borderColor: "black",
+                                borderWidth: 2,
+                            },
+                        ],
+                    };
+                    setTotalChartData(newChartData);
+                }
+            } catch (e) {
+                setFetchError("Error occurred while fetching data");
+            }
         };
         if (totalChartData.labels.length == 0) {
             getPriceData();
@@ -297,7 +306,6 @@ function LineChart(props: LineChartProps) {
             ) => {
                 if (chart.config._config.data.labels.length == 0) {
                     const { ctx } = chart;
-                    console.log(ctx);
 
                     ctx.save();
                     ctx.font = "30px Arial";
@@ -322,7 +330,6 @@ function LineChart(props: LineChartProps) {
         if (latestIndex < 0) {
             return 0.0;
         }
-        //console.log(latestIndex)
 
         let historyData = totalChartData.datasets[0].data.slice(
             Math.max(0, latestIndex - hInPast),
@@ -383,11 +390,6 @@ function LineChart(props: LineChartProps) {
             >
                 <div className="flex mb-1 text-white">
                     <span className="grow"></span>
-                    <span className="">
-                        {date != null ? (
-                            <span>Päivitetty: {formatChartDate(date)}</span>
-                        ) : null}
-                    </span>
                 </div>
                 <div className="flex mb-2">
                     <button
@@ -442,105 +444,112 @@ function LineChart(props: LineChartProps) {
                         3kk
                     </button>
                 </div>
-
-                <Line
-                    data={chartData}
-                    plugins={plugins}
-                    options={{
-                        interaction: {
-                            mode: "nearest",
-                            axis: "x",
-                            intersect: false,
-                        },
-                        animation: false,
-                        elements: {
-                            point: {
-                                radius: 0,
-                                backgroundColor: "black",
+                {fetchError == "" ? (
+                    <Line
+                        data={chartData}
+                        plugins={plugins}
+                        options={{
+                            interaction: {
+                                mode: "nearest",
+                                axis: "x",
+                                intersect: false,
                             },
-                        },
-                        plugins: {
-                            title: {
-                                display: false,
-                                text: "Hinta snt/kWh",
-                            },
-                            legend: {
-                                display: false,
-                            },
-                            tooltip: {
-                                displayColors: false,
-                                backgroundColor: "#fef08a",
-                                titleColor: "black",
-                                bodyColor: "black",
-                                callbacks: {
-                                    label: function (context) {
-                                        let value = (
-                                            context.parsed.y / 10
-                                        ).toFixed(2);
-
-                                        return value + " snt/kWh";
-                                    },
-                                    title: function (context) {
-                                        let title = context[0].label;
-                                        let date = new Date(title);
-                                        return (
-                                            date.getDate() +
-                                            "." +
-                                            (date.getMonth() + 1) +
-                                            " " +
-                                            zeroPad(date.getHours()) +
-                                            ":" +
-                                            zeroPad(date.getMinutes())
-                                        );
-                                    },
+                            animation: false,
+                            elements: {
+                                point: {
+                                    radius: 0,
+                                    backgroundColor: "black",
                                 },
                             },
-                        },
-                        scales: {
-                            x: {
-                                offset: false,
-                                ticks: {
-                                    callback: function (
-                                        value: any,
-                                        index,
-                                        ticks: any
-                                    ) {
-                                        let date = new Date(
-                                            chartData.labels[index]
-                                        );
-                                        return (
-                                            date.getDate() +
-                                            "." +
-                                            (date.getMonth() + 1) +
-                                            " " +
-                                            zeroPad(date.getHours()) +
-                                            ":" +
-                                            zeroPad(date.getMinutes())
-                                        );
-                                    },
-                                },
-                            },
-                            y: {
-                                //min: Math.min(...props.chartData.datasets[0].data) >= 0 ? 0 : Math.min(...props.chartData.datasets[0].data) * 1.24*1.1,
-                                //max: Math.max(...props.chartData.datasets[0].data) * 1.24*1.1,
-                                ticks: {
-                                    callback: function (
-                                        value: any,
-                                        index,
-                                        ticks
-                                    ) {
-                                        return parseInt(value) / 10;
-                                    },
-                                    stepSize: 100,
-                                },
+                            plugins: {
                                 title: {
-                                    display: true,
-                                    text: "c/kWh",
+                                    display: false,
+                                    text: "Hinta snt/kWh",
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                tooltip: {
+                                    displayColors: false,
+                                    backgroundColor: "#fef08a",
+                                    titleColor: "black",
+                                    bodyColor: "black",
+                                    callbacks: {
+                                        label: function (context) {
+                                            let value = (
+                                                context.parsed.y / 10
+                                            ).toFixed(2);
+
+                                            return value + " snt/kWh";
+                                        },
+                                        title: function (context) {
+                                            let title = context[0].label;
+                                            let date = new Date(title);
+                                            return (
+                                                date.getDate() +
+                                                "." +
+                                                (date.getMonth() + 1) +
+                                                " " +
+                                                zeroPad(date.getHours()) +
+                                                ":" +
+                                                zeroPad(date.getMinutes())
+                                            );
+                                        },
+                                    },
                                 },
                             },
-                        },
-                    }}
-                />
+                            scales: {
+                                x: {
+                                    offset: false,
+                                    ticks: {
+                                        callback: function (
+                                            value: any,
+                                            index,
+                                            ticks: any
+                                        ) {
+                                            let date = new Date(
+                                                chartData.labels[index]
+                                            );
+                                            return (
+                                                date.getDate() +
+                                                "." +
+                                                (date.getMonth() + 1) +
+                                                " " +
+                                                zeroPad(date.getHours()) +
+                                                ":" +
+                                                zeroPad(date.getMinutes())
+                                            );
+                                        },
+                                    },
+                                },
+                                y: {
+                                    //min: Math.min(...props.chartData.datasets[0].data) >= 0 ? 0 : Math.min(...props.chartData.datasets[0].data) * 1.24*1.1,
+                                    //max: Math.max(...props.chartData.datasets[0].data) * 1.24*1.1,
+                                    ticks: {
+                                        callback: function (
+                                            value: any,
+                                            index,
+                                            ticks
+                                        ) {
+                                            return parseInt(value) / 10;
+                                        },
+                                        stepSize: 100,
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: "c/kWh",
+                                    },
+                                },
+                            },
+                        }}
+                    />
+                ) : (
+                    <div className="w-full grid items-center">
+                        <span className="w-full text-white text-center">
+                            {fetchError}
+                        </span>
+                    </div>
+                )}
             </div>
         </div>
     );
