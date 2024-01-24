@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NewsList from "./newslist";
 import { Article } from "@/common/common";
 
@@ -9,6 +9,28 @@ interface NewsProps {
     articles: Array<Array<Article>>;
 }
 
+interface NewsCategoryProps {
+    source: String;
+    index: number;
+    activeSource: number;
+    setActiveSource: (index: number) => void;
+}
+
+function NewsCategory(props: NewsCategoryProps) {
+    return (
+        <button
+            className={` grow text-lg  hover:text-black hover:bg-yellow-400 text-center h-12 ${
+                props.index == props.activeSource
+                    ? "bg-yellow-400 text-black"
+                    : "bg-zinc-700 text-white "
+            }`}
+            onClick={() => props.setActiveSource(props.index)}
+        >
+            <span>{props.source}</span>
+        </button>
+    );
+}
+
 function News(props: NewsProps) {
     const [activeSource, setActiveSource] = useState(0);
 
@@ -16,17 +38,13 @@ function News(props: NewsProps) {
         <div className="h-full w-full rounded-lg mt-2 transparent">
             <div className="flex w-full justify-center ">
                 {props.sources.map((source: String, index: number) => (
-                    <button
+                    <NewsCategory
                         key={source.toString()}
-                        className={` grow text-lg  hover:text-black hover:bg-yellow-400 text-center h-12 ${
-                            index == activeSource
-                                ? "bg-yellow-400 text-black"
-                                : "bg-zinc-700 text-white "
-                        }`}
-                        onClick={() => setActiveSource(index)}
-                    >
-                        <span>{source}</span>
-                    </button>
+                        source={source}
+                        index={index}
+                        activeSource={activeSource}
+                        setActiveSource={setActiveSource}
+                    />
                 ))}
             </div>
 
