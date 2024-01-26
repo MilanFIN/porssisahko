@@ -1,6 +1,6 @@
 "use server";
 
-import { zeroPad } from "@/common/common";
+import { TimeSeriesPrice, zeroPad } from "@/common/common";
 import { TIMEOUT } from "dns";
 import cacheData from "memory-cache";
 import { revalidateTag } from "next/cache";
@@ -10,6 +10,16 @@ const { JSDOM } = jsdom;
 var convert = require("xml-js");
 
 const CACHESECONDS = 3600;
+
+interface Result {
+    header: string;
+    href: string;
+    image: string;
+    imagealt?:string;
+    date?: string;
+}
+
+
 
 export const getNews = async (type: string) => {
     if (type == "yle") {
@@ -37,7 +47,7 @@ export const getYleContent = async (wait: boolean) => {
 
         const response = await fetch(url, { cache: "no-store" });
         let data = await response.text();
-        let results: any = [];
+        let results = new Array<Result>();
 
         let lineContent = data.split("\n");
         let initialScript = lineContent[lineContent.length - 5];
@@ -49,7 +59,7 @@ export const getYleContent = async (wait: boolean) => {
         let initialState = JSON.parse(removedEnd);
 
         initialState.pageData.layout.forEach((element: any) => {
-            let result = {
+            let result:Result = {
                 header: element.texts.headline.text,
                 href: NEWSURL + element.url,
                 image: IMAGEURL + element.image.id,
@@ -78,7 +88,7 @@ export const getHsContent = async (wait: boolean) => {
 
         const response = await fetch(url, { cache: "no-store" });
         let data = await response.text();
-        let results: any = [];
+        let results = new Array<Result>();
 
         const dom = new JSDOM(data);
         //fetching all article links
@@ -90,7 +100,7 @@ export const getHsContent = async (wait: boolean) => {
             let headerDom = element.getElementsByClassName("teaser-title-30");
             let imgDom = element.getElementsByTagName("img");
             if (headerDom.length != 0 && imgDom.length != 0) {
-                let result = {
+                let result:Result = {
                     header: headerDom[0].getElementsByTagName("span")[2]
                         .textContent,
                     href:
@@ -120,7 +130,7 @@ export const getIsContent = async (wait: boolean) => {
 
         const response = await fetch(url);
         let data = await response.text();
-        let results: any = [];
+        let results = new Array<Result>();
 
         const dom = new JSDOM(data);
         //fetching all article links
@@ -154,7 +164,7 @@ export const getIsContent = async (wait: boolean) => {
 
             let imgDom = element.getElementsByTagName("img");
             if (headerDom.length != 0 && imgDom.length != 0) {
-                let result = {
+                let result:Result = {
                     header: headerDom[0].textContent,
                     href:
                         NEWSURL + element.getAttribute("data-id") + NEWSENDURL,
@@ -184,11 +194,11 @@ export const getIlContent = async (wait: boolean) => {
         const response = await fetch(url, { cache: "no-store" });
         let data = await response.json();
         data = data.response;
-        let results: any = [];
+        let results = new Array<Result>;
 
         data.forEach((element: any) => {
             let category = element.category.category_name;
-            let result = {
+            let result:Result = {
                 header: element.title,
                 href:
                     NEWSURL +
@@ -257,7 +267,7 @@ export const getDayAheadData = async (wait: boolean) => {
 
             let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
 
-            let timeData: any = [];
+            let timeData = new Array<TimeSeriesPrice>();
 
             timeSeriesData.forEach((element: any) => {
                 let period = element.Period;
@@ -274,7 +284,7 @@ export const getDayAheadData = async (wait: boolean) => {
                     timeData.push({
                         Timestamp: correspondingDate.toISOString(),
                         Value: price,
-                    });
+                    } as TimeSeriesPrice);
                 });
             });
 

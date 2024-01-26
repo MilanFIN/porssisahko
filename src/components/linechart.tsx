@@ -33,7 +33,7 @@ import {
     DatasetController,
 } from "chart.js";
 import { useEffect, useState } from "react";
-import { zeroPad } from "@/common/common";
+import { zeroPad, PriceData, PriceValue } from "@/common/common";
 import { InfoBox } from "./infobox";
 import { getDayAheadData } from "@/app/actions";
 
@@ -70,16 +70,6 @@ interface LineChartProps {
     date: Date | null;
 }
 
-interface PriceValue {
-    Timestamp: string;
-    Value: number;
-}
-
-interface PriceData {
-    data: Array<PriceValue>;
-    date: string;
-    error: string;
-}
 
 interface ChartData {
     datasets: Array<any>;

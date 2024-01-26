@@ -1,6 +1,6 @@
 import { getDayAheadData } from "@/app/actions";
 import LineChart from "./linechart";
-import { PriceData } from "@/common/common";
+import { PriceData, TimeSeriesPrice } from "@/common/common";
 
 async function LineChartWrapper() {
     const dayAheadData = await getDayAheadData(false);
@@ -9,13 +9,13 @@ async function LineChartWrapper() {
     const chartData =
         priceData.data.length != 0
             ? {
-                  labels: priceData.data.map((data: any) => data.Timestamp),
+                  labels: priceData.data.map((data: TimeSeriesPrice) => data.Timestamp),
                   datasets: [
                       {
                           label:
                               "Hinta " +
-                              priceData.data.map((data: any) => data.Timestamp),
-                          data: priceData.data.map((data: any) => data.Value),
+                              priceData.data.map((data: TimeSeriesPrice) => data.Timestamp),
+                          data: priceData.data.map((data: TimeSeriesPrice) => data.Value),
                           borderColor: "black",
                           borderWidth: 2,
                       },

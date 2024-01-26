@@ -15,7 +15,18 @@ export const zeroPad = function (value: number) {
 };
 
 
+export interface PriceValue {
+    Timestamp: string;
+    Value: number;
+}
+
 export interface PriceData {
+    data: Array<PriceValue>;
     date: string;
-    data: any;
+    error?: string;
+}
+
+export interface  TimeSeriesPrice {
+    Timestamp: string;
+    Value: number;
 }
