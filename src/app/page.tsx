@@ -38,7 +38,7 @@ export default async function Home() {
                                 <p>
                                     Tämän sivun tarkoitus on näyttää
                                     pörssisähkön hinta seuraavalle päivälle ja
-                                    edeltävälle 3 kuukaudelle. Sivulla näkyvän
+                                    edeltävälle kuukaudelle. Sivulla näkyvän
                                     kuvaajan lisäksi on listattuna jonkin verran
                                     asiaan liityviä uutisia. Lähdekoodi on
                                     näkyvissä{" "}

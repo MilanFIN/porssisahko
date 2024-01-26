@@ -1,6 +1,7 @@
 "use server";
 
 import { zeroPad } from "@/common/common";
+import { TIMEOUT } from "dns";
 import cacheData from "memory-cache";
 import { revalidateTag } from "next/cache";
 
@@ -226,7 +227,7 @@ export const getDayAheadData = async (wait: boolean) => {
             zeroPad(tomorrow.getMinutes());
 
         let oneMonthAgo = new Date();
-        oneMonthAgo.setDate(oneMonthAgo.getDate() - 90);
+        oneMonthAgo.setDate(oneMonthAgo.getDate() - 31);
         oneMonthAgo.setHours(0, 0, 0, 0);
 
         let oneMonthStamp =
@@ -242,7 +243,8 @@ export const getDayAheadData = async (wait: boolean) => {
         try {
             var response = await fetch(url, {
                 cache: "no-cache",
-            })
+                signal: AbortSignal.timeout(9500),
+            });
 
             if (response.status != 200) {
                 return { error: "Failed to fetch price data" };
@@ -253,8 +255,7 @@ export const getDayAheadData = async (wait: boolean) => {
                 convert.xml2json(data, { compact: true, spaces: 4 })
             );
 
-            let timeSeriesData =
-                jsonData.Publication_MarketDocument.TimeSeries;
+            let timeSeriesData = jsonData.Publication_MarketDocument.TimeSeries;
 
             let timeData: any = [];
 
@@ -278,21 +279,15 @@ export const getDayAheadData = async (wait: boolean) => {
             });
 
             const result = {
-                date: jsonData.Publication_MarketDocument.createdDateTime
-                    ._text,
+                date: jsonData.Publication_MarketDocument.createdDateTime._text,
                 data: timeData,
             };
 
             cacheData.put(key, result, 1000 * CACHESECONDS);
 
             return result;
-
-        }
-        catch (e) {
+        } catch (e) {
             return { error: "Failed to fetch price data" };
         }
-
-
-
     }
 };

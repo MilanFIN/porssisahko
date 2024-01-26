@@ -87,7 +87,7 @@ interface ChartData {
 }
 
 function LineChart(props: LineChartProps) {
-    const [fetchError, setFetchError] = useState("");
+    const [fetchError, setFetchError] = useState(0);
     const [tax, setTax] = useState(0.24);
     const [history, setHistory] = useState(7);
 
@@ -105,7 +105,7 @@ function LineChart(props: LineChartProps) {
             try {
                 priceData = await getDayAheadData(true);
                 if (priceData.error) {
-                    setFetchError(priceData.error);
+                    setFetchError(fetchError + 1);
                 } else {
                     let parsedData = priceData as PriceData;
 
@@ -129,13 +129,13 @@ function LineChart(props: LineChartProps) {
                     setTotalChartData(newChartData);
                 }
             } catch (e) {
-                setFetchError("Error occurred while fetching data");
+                setFetchError(fetchError + 1);
             }
         };
-        if (totalChartData.labels.length == 0) {
+        if (totalChartData.labels.length == 0 && fetchError < 3) {
             getPriceData();
         }
-    }, []);
+    }, [fetchError]);
 
     useEffect(() => {
         let newChartData = JSON.parse(
@@ -436,7 +436,7 @@ function LineChart(props: LineChartProps) {
                         1kk
                     </button>
                     <button
-                        className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
+                        className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 hidden ${
                             history == 90 ? "bg-yellow-400" : "bg-gray-300"
                         }`}
                         onClick={() => setHistory(90)}
@@ -444,7 +444,7 @@ function LineChart(props: LineChartProps) {
                         3kk
                     </button>
                 </div>
-                {fetchError == "" ? (
+                {fetchError < 2 ? (
                     <Line
                         data={chartData}
                         plugins={plugins}
