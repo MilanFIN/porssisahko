@@ -40,7 +40,8 @@ function NewsItem(props: NewsItemProps) {
     return (
         <li
             key={props.item.header}
-            className="w-full mb-2 bg-zinc-600 rounded-lg p-2 hover:bg-yellow-400 text-white hover:text-black"
+            className="w-full mb-2 bg-zinc-600 dark:bg-zinc-200 rounded-lg p-2 hover:bg-yellow-400
+                         text-white hover:text-black dark:text-black  dark:hover:bg-yellow-400"
         >
             <a className="w-full flex " href={props.item.href} target="_blank">
                 <img
@@ -63,7 +64,7 @@ function NewsItem(props: NewsItemProps) {
 
 function NewsList(props: NewsListProps) {
     return (
-        <div className="h-full w-full bg-zinc-700 p-2 rounded-b-lg">
+        <div className="h-full w-full bg-zinc-700 dark:bg-zinc-300 p-2 rounded-b-lg">
             <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
                 {props.articles.length != 0
                     ? props.articles

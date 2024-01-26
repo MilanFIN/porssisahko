@@ -394,7 +394,7 @@ function LineChart(props: LineChartProps) {
                 <div className="flex mb-2">
                     <button
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400  ${
-                            tax == 0 ? "bg-yellow-400" : "bg-gray-300"
+                            tax == 0 ? "bg-yellow-400" : "bg-gray-300 dark:bg-gray-400"
                         }`}
                         onClick={() => setTax(0)}
                     >
@@ -402,7 +402,7 @@ function LineChart(props: LineChartProps) {
                     </button>
                     <button
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
-                            tax !== 0 ? "bg-yellow-400" : "bg-gray-300"
+                            tax !== 0 ? "bg-yellow-400" : "bg-gray-300 dark:bg-gray-400"
                         }`}
                         onClick={() => setTax(0.24)}
                     >
@@ -413,7 +413,7 @@ function LineChart(props: LineChartProps) {
 
                     <button
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
-                            history == 1 ? "bg-yellow-400" : "bg-gray-300"
+                            history == 1 ? "bg-yellow-400" : "bg-gray-300 dark:bg-gray-400"
                         }`}
                         onClick={() => setHistory(1)}
                     >
@@ -421,7 +421,7 @@ function LineChart(props: LineChartProps) {
                     </button>
                     <button
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
-                            history == 7 ? "bg-yellow-400" : "bg-gray-300"
+                            history == 7 ? "bg-yellow-400" : "bg-gray-300 dark:bg-gray-400"
                         }`}
                         onClick={() => setHistory(7)}
                     >
@@ -429,7 +429,7 @@ function LineChart(props: LineChartProps) {
                     </button>
                     <button
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
-                            history == 30 ? "bg-yellow-400" : "bg-gray-300"
+                            history == 30 ? "bg-yellow-400" : "bg-gray-300 dark:bg-gray-400"
                         }`}
                         onClick={() => setHistory(30)}
                     >
@@ -437,7 +437,7 @@ function LineChart(props: LineChartProps) {
                     </button>
                     <button
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 hidden ${
-                            history == 90 ? "bg-yellow-400" : "bg-gray-300"
+                            history == 90 ? "bg-yellow-400" : "bg-gray-300 dark:bg-gray-400"
                         }`}
                         onClick={() => setHistory(90)}
                     >
@@ -546,7 +546,7 @@ function LineChart(props: LineChartProps) {
                 ) : (
                     <div className="w-full grid items-center">
                         <span className="w-full text-white text-center">
-                            {"Failed to fetch price data"}
+                            {"Hintadatan haussa tapahtui virhe"}
                         </span>
                     </div>
                 )}

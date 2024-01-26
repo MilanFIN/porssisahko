@@ -19,10 +19,10 @@ interface NewsCategoryProps {
 function NewsCategory(props: NewsCategoryProps) {
     return (
         <button
-            className={` grow text-lg  hover:text-black hover:bg-yellow-400 text-center h-12 ${
+            className={`grow text-lg hover:text-black hover:bg-yellow-400 dark:hover:bg-yellow-400 text-center h-12 ${
                 props.index == props.activeSource
                     ? "bg-yellow-400 text-black"
-                    : "bg-zinc-700 text-white "
+                    : "bg-zinc-700 dark:bg-zinc-300 text-white dark:text-black"
             }`}
             onClick={() => props.setActiveSource(props.index)}
         >

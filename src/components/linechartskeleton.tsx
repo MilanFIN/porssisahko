@@ -35,29 +35,29 @@ export async function LineChartSkeleton() {
             `}
             >
                 <div className="flex mb-2">
-                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300`}>
+                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300 dark:bg-gray-400`}>
                         alv 0%
                     </button>
-                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300`}>
+                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300 dark:bg-gray-400`}>
                         alv 24%
                     </button>
 
                     <span className="grow"></span>
 
-                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300`}>
+                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300 dark:bg-gray-400`}>
                         1pv
                     </button>
-                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300`}>
+                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300 dark:bg-gray-400`}>
                         1vk
                     </button>
-                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300`}>
+                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300 dark:bg-gray-400`}>
                         1kk
                     </button>
-                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300`}>
+                    <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300 dark:bg-gray-400`}>
                         3kk
                     </button>
                 </div>
-                <div className="w-full text-center text-white">Ladataan...</div>
+                <div className="w-full text-center text-white dark:text-black">Ladataan...</div>
             </div>
         </div>
     );
