@@ -19,7 +19,7 @@ export const DarkThemeProvider = ({ children }: Props) => {
     }
 
     return (
-        <ThemeProvider enableSystem={true} attribute="class">
+        <ThemeProvider enableSystem={false} defaultTheme="light" attribute="class">
             {children}
         </ThemeProvider>
     );
