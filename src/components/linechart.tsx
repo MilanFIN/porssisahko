@@ -546,7 +546,7 @@ function LineChart(props: LineChartProps) {
                 ) : (
                     <div className="w-full grid items-center">
                         <span className="w-full text-white text-center">
-                            {fetchError}
+                            {"Failed to fetch price data"}
                         </span>
                     </div>
                 )}
