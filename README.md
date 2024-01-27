@@ -1,13 +1,18 @@
 # A website to visualize finnish electricity prices
 
-This project is supposed to visualize nordpool electricity day-ahead prices in Finland. Additionally the page
+This project attempt to visualize nordpool electricity day-ahead prices in Finland. Additionally the page
 aggregates relevant links for various finnish news sources.
 
 ## Environment setup
 
-* For the price data api to work, `ENTSOE_SECURITY_TOKEN` must be set in `.env.local`, see [Entsoe api guide](https://transparency.entsoe.eu/content/static_content/Static%20content/web%20api/Guide.html) and [Entsoe instructions for requesting api token](https://transparency.entsoe.eu/content/static_content/download?path=/Static%20content/API-Token-Management.pdf)
+* Set Entso-e api token to `ENTSOE_SECURITY_TOKEN` in `.env`. This is needed to fetch the day-ahead price data. See [Entsoe api guide](https://transparency.entsoe.eu/content/static_content/Static%20content/web%20api/Guide.html) and [Entsoe instructions for requesting api token](https://transparency.entsoe.eu/content/static_content/download?path=/Static%20content/API-Token-Management.pdf)
 * Install dependencies with `npm install`
 * Run locally: `npm run dev` or `npm run build && npm start`
+
+## Tests
+
+* Unit tests for the news and price data parsers have been written with Jest.
+* Run with `npm test`
 
 ## Caching
 
