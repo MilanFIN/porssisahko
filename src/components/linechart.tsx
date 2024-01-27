@@ -93,7 +93,7 @@ function LineChart(props: LineChartProps) {
         const getPriceData = async () => {
             let priceData: PriceData;
             try {
-                priceData = await getDayAheadData(true);
+                priceData = await getDayAheadData(true, 9500);
                 if (priceData.error) {
                     setFetchError(fetchError + 1);
                 } else {

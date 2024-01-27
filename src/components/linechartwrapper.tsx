@@ -3,7 +3,7 @@ import LineChart from "./linechart";
 import { PriceData, TimeSeriesPrice } from "@/common/common";
 
 async function LineChartWrapper() {
-    const dayAheadData = await getDayAheadData(false);
+    const dayAheadData = await getDayAheadData(false, 0);
     const priceData = dayAheadData as PriceData;
 
     const chartData =

@@ -15,11 +15,9 @@ interface Result {
     header: string;
     href: string;
     image: string;
-    imagealt?:string;
+    imagealt?: string;
     date?: string;
 }
-
-
 
 export const getNews = async (type: string) => {
     if (type == "yle") {
@@ -59,7 +57,7 @@ export const getYleContent = async (wait: boolean) => {
         let initialState = JSON.parse(removedEnd);
 
         initialState.pageData.layout.forEach((element: any) => {
-            let result:Result = {
+            let result: Result = {
                 header: element.texts.headline.text,
                 href: NEWSURL + element.url,
                 image: IMAGEURL + element.image.id,
@@ -100,7 +98,7 @@ export const getHsContent = async (wait: boolean) => {
             let headerDom = element.getElementsByClassName("teaser-title-30");
             let imgDom = element.getElementsByTagName("img");
             if (headerDom.length != 0 && imgDom.length != 0) {
-                let result:Result = {
+                let result: Result = {
                     header: headerDom[0].getElementsByTagName("span")[2]
                         .textContent,
                     href:
@@ -164,7 +162,7 @@ export const getIsContent = async (wait: boolean) => {
 
             let imgDom = element.getElementsByTagName("img");
             if (headerDom.length != 0 && imgDom.length != 0) {
-                let result:Result = {
+                let result: Result = {
                     header: headerDom[0].textContent,
                     href:
                         NEWSURL + element.getAttribute("data-id") + NEWSENDURL,
@@ -194,11 +192,11 @@ export const getIlContent = async (wait: boolean) => {
         const response = await fetch(url, { cache: "no-store" });
         let data = await response.json();
         data = data.response;
-        let results = new Array<Result>;
+        let results = new Array<Result>();
 
         data.forEach((element: any) => {
             let category = element.category.category_name;
-            let result:Result = {
+            let result: Result = {
                 header: element.title,
                 href:
                     NEWSURL +
@@ -218,7 +216,7 @@ export const getIlContent = async (wait: boolean) => {
     }
 };
 
-export const getDayAheadData = async (wait: boolean) => {
+export const getDayAheadData = async (wait: boolean, timeout: number) => {
     const key = "entsoe-prices";
     const value = cacheData.get(key);
     if (value) {
@@ -251,11 +249,15 @@ export const getDayAheadData = async (wait: boolean) => {
 
         let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${oneMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
         try {
-            var response = await fetch(url, {
-                cache: "no-cache",
-                signal: AbortSignal.timeout(9500),
-            });
-
+            var response =
+                timeout != 0
+                    ? await fetch(url, {
+                          cache: "no-cache",
+                          signal: AbortSignal.timeout(timeout),
+                      })
+                    : await fetch(url, {
+                          cache: "no-cache",
+                      });
             if (response.status != 200) {
                 return { error: "Failed to fetch price data" };
             }
