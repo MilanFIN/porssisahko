@@ -11,7 +11,9 @@ aggregates relevant links for various finnish news sources.
 
 ## Tests
 
-* Unit tests for the news and price data parsers have been written with Jest.
+Tests written with Jest. Includes:
+* Tests for the news and price data parsers.
+* Basic sanity check tests for ui components where feasible.
 * Run with `npm test`
 
 ## Caching
