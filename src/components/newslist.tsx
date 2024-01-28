@@ -19,7 +19,7 @@ interface NewsItemProps {
     };
 }
 
-function NewsItem(props: NewsItemProps) {
+export function NewsItem(props: NewsItemProps) {
     const formatDate = (articleDate: Date) => {
         if (Number.isNaN(articleDate.getDate())) {
             return "";

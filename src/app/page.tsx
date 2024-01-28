@@ -19,7 +19,7 @@ import Link from "next/link";
 import DarkModeCheckBox from "@/components/darkmodecheckbox";
 import { DarkThemeProvider } from "./providers";
 
-export default async function Home() {
+export default function Home() {
     return (
         <DarkThemeProvider>
             <main

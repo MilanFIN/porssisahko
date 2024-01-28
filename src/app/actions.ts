@@ -43,33 +43,39 @@ export const getYleContent = async (wait: boolean) => {
         const IMAGEURL =
             "https://images.cdn.yle.fi/image/upload/w_196,h_110,ar_1.7777777777777777,dpr_1,c_fill/q_auto:eco,f_auto,fl_lossy/v420/";
 
-        const response = await fetch(url, { cache: "no-store" });
-        let data = await response.text();
-        let results = new Array<Result>();
+        try {
+            const response = await fetch(url, { cache: "no-store" });
+            let data = await response.text();
+            let results = new Array<Result>();
 
-        let lineContent = data.split("\n");
-        let initialScript = lineContent[lineContent.length - 5];
-        let removedStart = initialScript.substring(initialScript.indexOf("{"));
-        let removedEnd = removedStart.substring(
-            0,
-            removedStart.lastIndexOf("}") + 1
-        );
-        let initialState = JSON.parse(removedEnd);
+            let lineContent = data.split("\n");
+            let initialScript = lineContent[lineContent.length - 5];
+            let removedStart = initialScript.substring(
+                initialScript.indexOf("{")
+            );
+            let removedEnd = removedStart.substring(
+                0,
+                removedStart.lastIndexOf("}") + 1
+            );
+            let initialState = JSON.parse(removedEnd);
 
-        initialState.pageData.layout.forEach((element: any) => {
-            let result: Result = {
-                header: element.texts.headline.text,
-                href: NEWSURL + element.url,
-                image: IMAGEURL + element.image.id,
-                imagealt: element.image.alt,
-                date: element.publishedAt,
-            };
-            results.push(result);
-        });
+            initialState.pageData.layout.forEach((element: any) => {
+                let result: Result = {
+                    header: element.texts.headline.text,
+                    href: NEWSURL + element.url,
+                    image: IMAGEURL + element.image.id,
+                    imagealt: element.image.alt,
+                    date: element.publishedAt,
+                };
+                results.push(result);
+            });
 
-        cacheData.put(url, results, 1000 * CACHESECONDS);
+            cacheData.put(url, results, 1000 * CACHESECONDS);
 
-        return results;
+            return results;
+        } catch (e) {
+            return [];
+        }
     } else {
         return [];
     }
@@ -83,35 +89,42 @@ export const getHsContent = async (wait: boolean) => {
     } else if (wait) {
         const NEWSURL = "https://www.hs.fi/art-";
         const NEWSENDURL = ".html";
+        try {
+            const response = await fetch(url, { cache: "no-store" });
+            let data = await response.text();
+            let results = new Array<Result>();
 
-        const response = await fetch(url, { cache: "no-store" });
-        let data = await response.text();
-        let results = new Array<Result>();
+            const dom = new JSDOM(data);
+            //fetching all article links
+            let tags =
+                dom.window.document.getElementsByClassName("teaser-m__border");
 
-        const dom = new JSDOM(data);
-        //fetching all article links
-        let tags =
-            dom.window.document.getElementsByClassName("teaser-m__border");
+            let tagsArray = [...tags];
+            tagsArray.forEach((element: any, index: number) => {
+                let headerDom =
+                    element.getElementsByClassName("teaser-title-30");
+                let imgDom = element.getElementsByTagName("img");
+                if (headerDom.length != 0 && imgDom.length != 0) {
+                    let result: Result = {
+                        header: headerDom[0].getElementsByTagName("span")[2]
+                            .textContent,
+                        href:
+                            NEWSURL +
+                            element.getAttribute("data-id") +
+                            NEWSENDURL,
+                        image: imgDom[0].src,
+                    };
+                    results.push(result);
+                }
+            });
 
-        let tagsArray = [...tags];
-        tagsArray.forEach((element: any, index: number) => {
-            let headerDom = element.getElementsByClassName("teaser-title-30");
-            let imgDom = element.getElementsByTagName("img");
-            if (headerDom.length != 0 && imgDom.length != 0) {
-                let result: Result = {
-                    header: headerDom[0].getElementsByTagName("span")[2]
-                        .textContent,
-                    href:
-                        NEWSURL + element.getAttribute("data-id") + NEWSENDURL,
-                    image: imgDom[0].src,
-                };
-                results.push(result);
-            }
-        });
+            cacheData.put(url, results, 1000 * CACHESECONDS);
 
-        cacheData.put(url, results, 1000 * CACHESECONDS);
+            return results;
 
-        return results;
+        } catch (e) {
+            return [];
+        }
     } else {
         return [];
     }
@@ -126,55 +139,62 @@ export const getIsContent = async (wait: boolean) => {
         const NEWSURL = "https://www.is.fi/art-";
         const NEWSENDURL = ".html";
 
-        const response = await fetch(url);
-        let data = await response.text();
-        let results = new Array<Result>();
+        try {
+            const response = await fetch(url);
+            let data = await response.text();
+            let results = new Array<Result>();
 
-        const dom = new JSDOM(data);
-        //fetching all article links
-        let tags =
-            dom.window.document.getElementsByClassName("teaser-m__border");
-        let images = dom.window.document.getElementsByTagName("img");
+            const dom = new JSDOM(data);
+            //fetching all article links
+            let tags =
+                dom.window.document.getElementsByClassName("teaser-m__border");
+            let images = dom.window.document.getElementsByTagName("img");
 
-        let tagsArray = [...tags];
-        tagsArray.forEach((element: any, index: number) => {
-            let headerDom = element.getElementsByClassName("teaser-title-30");
-            let timeLabel =
-                element.getElementsByClassName("timestamp-label")[0]
-                    .textContent;
+            let tagsArray = [...tags];
+            tagsArray.forEach((element: any, index: number) => {
+                let headerDom =
+                    element.getElementsByClassName("teaser-title-30");
+                let timeLabel =
+                    element.getElementsByClassName("timestamp-label")[0]
+                        .textContent;
 
-            let content = timeLabel.split(" ");
-            let date = new Date();
-            if (content.length == 1) {
-                //eg. 15:10
-                let time = timeLabel.split(":");
-                date.setHours(time[0]);
-                date.setMinutes(time[1]);
-            } else if (content.length == 2) {
-                //eg. 6.12. 15:10
-                let dayAndMonth = content[0].split(".");
-                let time = content[1].split(":");
-                date.setMonth(dayAndMonth[1] - 1);
-                date.setDate(dayAndMonth[0]);
-                date.setHours(time[0]);
-                date.setMinutes(time[1]);
-            }
+                let content = timeLabel.split(" ");
+                let date = new Date();
+                if (content.length == 1) {
+                    //eg. 15:10
+                    let time = timeLabel.split(":");
+                    date.setHours(time[0]);
+                    date.setMinutes(time[1]);
+                } else if (content.length == 2) {
+                    //eg. 6.12. 15:10
+                    let dayAndMonth = content[0].split(".");
+                    let time = content[1].split(":");
+                    date.setMonth(dayAndMonth[1] - 1);
+                    date.setDate(dayAndMonth[0]);
+                    date.setHours(time[0]);
+                    date.setMinutes(time[1]);
+                }
 
-            let imgDom = element.getElementsByTagName("img");
-            if (headerDom.length != 0 && imgDom.length != 0) {
-                let result: Result = {
-                    header: headerDom[0].textContent,
-                    href:
-                        NEWSURL + element.getAttribute("data-id") + NEWSENDURL,
-                    image: imgDom[0].src,
-                    date: date.toISOString(),
-                };
-                results.push(result);
-            }
-        });
+                let imgDom = element.getElementsByTagName("img");
+                if (headerDom.length != 0 && imgDom.length != 0) {
+                    let result: Result = {
+                        header: headerDom[0].textContent,
+                        href:
+                            NEWSURL +
+                            element.getAttribute("data-id") +
+                            NEWSENDURL,
+                        image: imgDom[0].src,
+                        date: date.toISOString(),
+                    };
+                    results.push(result);
+                }
+            });
 
-        cacheData.put(url, results, 1000 * CACHESECONDS);
-        return results;
+            cacheData.put(url, results, 1000 * CACHESECONDS);
+            return results;
+        } catch (e) {
+            return [];
+        }
     } else {
         return [];
     }
@@ -189,28 +209,32 @@ export const getIlContent = async (wait: boolean) => {
     } else if (wait) {
         const NEWSURL = "https://www.iltalehti.fi/";
 
-        const response = await fetch(url, { cache: "no-store" });
-        let data = await response.json();
-        data = data.response;
-        let results = new Array<Result>();
+        try {
+            const response = await fetch(url, { cache: "no-store" });
+            let data = await response.json();
+            data = data.response;
+            let results = new Array<Result>();
 
-        data.forEach((element: any) => {
-            let category = element.category.category_name;
-            let result: Result = {
-                header: element.title,
-                href:
-                    NEWSURL +
-                    element.category.category_name +
-                    "/" +
-                    element.article_id,
-                image: element.main_image_urls["size138"],
-                date: element.published_at,
-            };
-            results.push(result);
-        });
-        cacheData.put(url, results, 1000 * CACHESECONDS);
+            data.forEach((element: any) => {
+                let category = element.category.category_name;
+                let result: Result = {
+                    header: element.title,
+                    href:
+                        NEWSURL +
+                        element.category.category_name +
+                        "/" +
+                        element.article_id,
+                    image: element.main_image_urls["size138"],
+                    date: element.published_at,
+                };
+                results.push(result);
+            });
+            cacheData.put(url, results, 1000 * CACHESECONDS);
 
-        return results;
+            return results;
+        } catch (e) {
+            return [];
+        }
     } else {
         return [];
     }
