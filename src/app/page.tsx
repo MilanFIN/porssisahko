@@ -20,6 +20,7 @@ import DarkModeCheckBox from "@/components/darkmodecheckbox";
 import { DarkThemeProvider } from "./providers";
 
 export default async function Home() {
+    console.log("OK")
     return (
         <DarkThemeProvider>
             <main
