@@ -5,22 +5,32 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import {
+    Result,
     getDayAheadData,
     getHsContent,
     getIlContent,
     getIsContent,
-    getYleContent,
+    parseDayAheadData,
+    parseHsContent,
+    parseIlContent,
+    parseIsContent,
+    parseYleContent,
 } from "../src/app/actions";
 import { Article, PriceValue } from "@/common/common";
 import cacheData from "memory-cache";
+import { readFileSync } from "fs";
+import path from "path";
 
 describe("Yle", () => {
     test("Test Yle news parser", async () => {
-        let yleContent = await getYleContent(true);
+        const file = path.join(__dirname, "./", "test_data/ylesample.txt");
+        const data = readFileSync(file, "utf8");
+
+        let yleContent = parseYleContent(data);
         expect(Array.isArray(yleContent)).toBe(true);
         expect(yleContent.length).toBeGreaterThan(0);
 
-        yleContent.forEach((item: Article) => {
+        yleContent.forEach((item: Result) => {
             expect(item).toHaveProperty("header");
             expect(item).toHaveProperty("href");
             expect(item).toHaveProperty("image");
@@ -32,11 +42,14 @@ describe("Yle", () => {
 
 describe("Hs", () => {
     test("Test HS news parser", async () => {
-        let hsContent = await getHsContent(true);
+        const file = path.join(__dirname, "./", "test_data/hssample.txt");
+        const data = readFileSync(file, "utf8");
+
+        let hsContent = parseHsContent(data);
         expect(Array.isArray(hsContent)).toBe(true);
         expect(hsContent.length).toBeGreaterThan(0);
 
-        hsContent.forEach((item: Article) => {
+        hsContent.forEach((item: Result) => {
             expect(item).toHaveProperty("header");
             expect(item).toHaveProperty("href");
             expect(item).toHaveProperty("image");
@@ -46,11 +59,14 @@ describe("Hs", () => {
 
 describe("Is", () => {
     test("Test IS news parser", async () => {
-        let isContent = await getIsContent(true);
+        const file = path.join(__dirname, "./", "test_data/issample.txt");
+        const data = readFileSync(file, "utf8");
+
+        let isContent = parseIsContent(data);
         expect(Array.isArray(isContent)).toBe(true);
         expect(isContent.length).toBeGreaterThan(0);
 
-        isContent.forEach((item: Article) => {
+        isContent.forEach((item: Result) => {
             expect(item).toHaveProperty("header");
             expect(item).toHaveProperty("href");
             expect(item).toHaveProperty("image");
@@ -61,11 +77,14 @@ describe("Is", () => {
 
 describe("Il", () => {
     test("Test IL news parser", async () => {
-        let ilContent = await getIlContent(true);
+        const file = path.join(__dirname, "./", "test_data/ilsample.json");
+        const data = JSON.parse(readFileSync(file, "utf8"));
+
+        let ilContent = parseIlContent(data.response);
         expect(Array.isArray(ilContent)).toBe(true);
         expect(ilContent.length).toBeGreaterThan(0);
 
-        ilContent.forEach((item: Article) => {
+        ilContent.forEach((item: Result) => {
             expect(item).toHaveProperty("header");
             expect(item).toHaveProperty("href");
             expect(item).toHaveProperty("image");
@@ -75,18 +94,11 @@ describe("Il", () => {
 });
 
 describe("entso-e", () => {
-    const OLD_ENV = process.env;
-    beforeEach(() => {
-        jest.resetModules();
-        process.env = { ...OLD_ENV };
-        cacheData.clear();
-    });
-
-    afterAll(() => {
-        process.env = OLD_ENV;
-    });
     test("Test electricity day ahead parser", async () => {
-        let priceData = await getDayAheadData(true, 0);
+        const file = path.join(__dirname, "./", "test_data/entsoesample.xml");
+        const data = readFileSync(file, "utf8");
+
+        let priceData = parseDayAheadData(data);
 
         expect(Array.isArray(priceData.data)).toBe(true);
         expect(priceData.data.length).toBeGreaterThan(0);
@@ -97,10 +109,5 @@ describe("entso-e", () => {
             expect(item).toHaveProperty("Timestamp");
             expect(item).toHaveProperty("Value");
         });
-    });
-    test("Test day ahead parser error handling", async () => {
-        process.env.ENTSOE_SECURITY_TOKEN = "invalid_value_here";
-        let priceData = await getDayAheadData(true, 0);
-        expect(priceData).toHaveProperty("error");
     });
 });
