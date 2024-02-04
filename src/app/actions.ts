@@ -33,7 +33,8 @@ async function cachePut(key:string, value:string) {
         cacheData.put(key, value, 1000 * 3600);
     }
     else {
-        await kv.set(key, value, {ex: 3600});
+        await kv.set(key, value);
+        await kv.expire(key, 3600);
     }
 }
 
