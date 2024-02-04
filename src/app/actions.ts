@@ -10,8 +10,6 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 var convert = require("xml-js");
 
-const CACHESECONDS = 3600;
-
 export interface Result {
     header: string;
     href: string;
@@ -30,9 +28,9 @@ async function cacheGet(key:string) {
     }
 }
 
-async function cachePut(key:string, value:string, timeout:number) {
+async function cachePut(key:string, value:string) {
     if (process.env.ENVIRONMENT == "development") {
-        cacheData.put(key, value, 1000 * CACHESECONDS);
+        cacheData.put(key, value, 1000 * 3600);
     }
     else {
         await kv.set(key, value, {ex: 3600});
@@ -77,7 +75,7 @@ export const getYleContent = async (wait: boolean) => {
         try {
             const response = await fetch(url, { cache: "no-store" });
             let results = parseYleContent(await response.text());
-            await cachePut("yle", JSON.stringify(results), 1000 * CACHESECONDS)
+            await cachePut("yle", JSON.stringify(results))
 
             return results;
         } catch (e) {
@@ -117,7 +115,7 @@ export const parseHsContent = (data: string) => {
 
 export const getHsContent = async (wait: boolean) => {
     const url = "https://www.hs.fi/aihe/sahko/";
-    const value = cacheData.get(url);
+    const value = await cacheGet("hs");
     if (value) {
         return value;
     } else if (wait) {
@@ -125,7 +123,7 @@ export const getHsContent = async (wait: boolean) => {
             const response = await fetch(url, { cache: "no-store" });
             let results = parseHsContent(await response.text());
 
-            cacheData.put(url, results, 1000 * CACHESECONDS);
+            await cachePut("hs", JSON.stringify(results))
 
             return results;
         } catch (e) {
@@ -187,7 +185,7 @@ export const parseIsContent = (data: string) => {
 
 export const getIsContent = async (wait: boolean) => {
     const url = "https://www.is.fi/aihe/sahko/";
-    const value = cacheData.get(url);
+    const value = await cacheGet("is");
     if (value) {
         return value;
     } else if (wait) {
@@ -195,7 +193,7 @@ export const getIsContent = async (wait: boolean) => {
             const response = await fetch(url);
             let results = parseIsContent(await response.text());
 
-            cacheData.put(url, results, 1000 * CACHESECONDS);
+            await cachePut("is", JSON.stringify(results))
             return results;
         } catch (e) {
             return [];
@@ -229,8 +227,8 @@ export const parseIlContent = (data: Record<string, any>) => {
 export const getIlContent = async (wait: boolean) => {
     const url =
         "https://api.il.fi/v1/articles/search?q=s%C3%A4hk%C3%B6&limit=10&image_sizes[]=size138";
-    const value = cacheData.get(url);
-    if (value) {
+        const value = await cacheGet("il");
+        if (value) {
         return value;
     } else if (wait) {
         try {
@@ -240,7 +238,7 @@ export const getIlContent = async (wait: boolean) => {
 
             const results = parseIlContent(data);
 
-            cacheData.put(url, results, 1000 * CACHESECONDS);
+            await cachePut("il", JSON.stringify(results))
 
             return results;
         } catch (e) {
@@ -286,8 +284,7 @@ export const parseDayAheadData = (data: string) => {
 };
 
 export const getDayAheadData = async (wait: boolean, timeout: number) => {
-    const key = "entsoe-prices";
-    const value = cacheData.get(key);
+    const value = await cacheGet("price");
     if (value) {
         return value;
     } else if (!wait) {
@@ -332,7 +329,7 @@ export const getDayAheadData = async (wait: boolean, timeout: number) => {
             }
             const result = parseDayAheadData(await response.text());
 
-            cacheData.put(key, result, 1000 * CACHESECONDS);
+            await cachePut("price", JSON.stringify(result))
 
             return result;
         } catch (e) {
