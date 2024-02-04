@@ -4,6 +4,7 @@ import { TimeSeriesPrice, zeroPad } from "@/common/common";
 import { TIMEOUT } from "dns";
 import cacheData from "memory-cache";
 import { revalidateTag } from "next/cache";
+import { kv } from '@vercel/kv';
 
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
@@ -19,19 +20,24 @@ export interface Result {
     date?: string;
 }
 
-export const getNews = async (type: string) => {
-    if (type == "yle") {
-        return getYleContent(true);
-    } else if (type == "is") {
-        return getIsContent(true);
-    } else if (type == "il") {
-        return getIlContent(true);
-    } else if (type == "hs") {
-        return getHsContent(true);
-    } else {
-        return [];
+async function cacheGet(key:string) {
+    if (process.env.ENVIRONMENT == "development") {
+        return JSON.parse(cacheData.get(key));
     }
-};
+    else {
+        let value = await kv.get(key);
+        return value
+    }
+}
+
+async function cachePut(key:string, value:string, timeout:number) {
+    if (process.env.ENVIRONMENT == "development") {
+        cacheData.put(key, value, 1000 * CACHESECONDS);
+    }
+    else {
+        await kv.set(key, value, {ex: 3600});
+    }
+}
 
 export const parseYleContent = (data: string) => {
     const NEWSURL = "http://yle.fi";
@@ -64,14 +70,14 @@ export const parseYleContent = (data: string) => {
 
 export const getYleContent = async (wait: boolean) => {
     const url = "https://yle.fi/uutiset/18-205950";
-    const value = cacheData.get(url);
+    const value = await cacheGet("yle");
     if (value) {
         return value;
     } else if (wait) {
         try {
             const response = await fetch(url, { cache: "no-store" });
             let results = parseYleContent(await response.text());
-            cacheData.put(url, results, 1000 * CACHESECONDS);
+            await cachePut("yle", JSON.stringify(results), 1000 * CACHESECONDS)
 
             return results;
         } catch (e) {

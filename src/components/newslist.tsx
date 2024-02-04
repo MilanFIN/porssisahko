@@ -1,6 +1,5 @@
 "use client";
 
-import { getNews } from "@/app/actions";
 import { zeroPad, Article } from "@/common/common";
 import React, { ReactNode, useEffect, useState } from "react";
 
