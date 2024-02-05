@@ -2,7 +2,7 @@
 	"crons": [
 	  {
 		"path": "/api/storeprice",
-		"schedule": "0 14 * * *"
+		"schedule": "20 12 * * *"
 	  }
 	]
   }
