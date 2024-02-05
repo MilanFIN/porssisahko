@@ -4,7 +4,7 @@ import { TimeSeriesPrice, zeroPad } from "@/common/common";
 import { TIMEOUT } from "dns";
 import cacheData from "memory-cache";
 import { revalidateTag } from "next/cache";
-import { kv } from '@vercel/kv';
+import { kv } from "@vercel/kv";
 
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
@@ -18,23 +18,30 @@ export interface Result {
     date?: string;
 }
 
-async function cacheGet(key:string) {
+async function cacheGet(key: string) {
     if (process.env.ENVIRONMENT == "development") {
         return JSON.parse(cacheData.get(key));
-    }
-    else {
+    } else {
         let value = await kv.get(key);
-        return value
+        return value;
     }
 }
 
-async function cachePut(key:string, value:string) {
+async function cachePut(key: string, value: string) {
     if (process.env.ENVIRONMENT == "development") {
         cacheData.put(key, value, 1000 * 3600);
-    }
-    else {
+    } else {
         await kv.set(key, value);
         await kv.expire(key, 3600);
+    }
+}
+
+async function durableCachePut(key: string, value: string) {
+    if (process.env.ENVIRONMENT == "development") {
+        cacheData.put(key, value, 1000 * 3600*24);
+    } else {
+        await kv.set(key, value);
+        await kv.expire(key, 3600 * 24);
     }
 }
 
@@ -76,7 +83,7 @@ export const getYleContent = async (wait: boolean) => {
         try {
             const response = await fetch(url, { cache: "no-store" });
             let results = parseYleContent(await response.text());
-            await cachePut("yle", JSON.stringify(results))
+            await cachePut("yle", JSON.stringify(results));
 
             return results;
         } catch (e) {
@@ -124,7 +131,7 @@ export const getHsContent = async (wait: boolean) => {
             const response = await fetch(url, { cache: "no-store" });
             let results = parseHsContent(await response.text());
 
-            await cachePut("hs", JSON.stringify(results))
+            await cachePut("hs", JSON.stringify(results));
 
             return results;
         } catch (e) {
@@ -194,7 +201,7 @@ export const getIsContent = async (wait: boolean) => {
             const response = await fetch(url);
             let results = parseIsContent(await response.text());
 
-            await cachePut("is", JSON.stringify(results))
+            await cachePut("is", JSON.stringify(results));
             return results;
         } catch (e) {
             return [];
@@ -228,8 +235,8 @@ export const parseIlContent = (data: Record<string, any>) => {
 export const getIlContent = async (wait: boolean) => {
     const url =
         "https://api.il.fi/v1/articles/search?q=s%C3%A4hk%C3%B6&limit=10&image_sizes[]=size138";
-        const value = await cacheGet("il");
-        if (value) {
+    const value = await cacheGet("il");
+    if (value) {
         return value;
     } else if (wait) {
         try {
@@ -239,7 +246,7 @@ export const getIlContent = async (wait: boolean) => {
 
             const results = parseIlContent(data);
 
-            await cachePut("il", JSON.stringify(results))
+            await cachePut("il", JSON.stringify(results));
 
             return results;
         } catch (e) {
@@ -284,6 +291,31 @@ export const parseDayAheadData = (data: string) => {
     };
 };
 
+function generatePriceDates() {
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 2);
+    tomorrow.setHours(0, 0, 0, 0);
+    let tomorrowStamp =
+        tomorrow.getFullYear().toString() +
+        zeroPad(tomorrow.getMonth() + 1) +
+        zeroPad(tomorrow.getDate()) +
+        zeroPad(tomorrow.getHours()) +
+        zeroPad(tomorrow.getMinutes());
+
+    let oneMonthAgo = new Date();
+    oneMonthAgo.setDate(oneMonthAgo.getDate() - 31);
+    oneMonthAgo.setHours(0, 0, 0, 0);
+
+    let oneMonthStamp =
+        oneMonthAgo.getFullYear().toString() +
+        zeroPad(oneMonthAgo.getMonth() + 1) +
+        zeroPad(oneMonthAgo.getDate()) +
+        zeroPad(oneMonthAgo.getHours()) +
+        zeroPad(oneMonthAgo.getMinutes());
+
+    return [tomorrowStamp, oneMonthStamp];
+}
+
 export const getDayAheadData = async (wait: boolean, timeout: number) => {
     const value = await cacheGet("price");
     if (value) {
@@ -291,26 +323,7 @@ export const getDayAheadData = async (wait: boolean, timeout: number) => {
     } else if (!wait) {
         return { date: null, data: [] };
     } else {
-        let tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 2);
-        tomorrow.setHours(0, 0, 0, 0);
-        let tomorrowStamp =
-            tomorrow.getFullYear().toString() +
-            zeroPad(tomorrow.getMonth() + 1) +
-            zeroPad(tomorrow.getDate()) +
-            zeroPad(tomorrow.getHours()) +
-            zeroPad(tomorrow.getMinutes());
-
-        let oneMonthAgo = new Date();
-        oneMonthAgo.setDate(oneMonthAgo.getDate() - 31);
-        oneMonthAgo.setHours(0, 0, 0, 0);
-
-        let oneMonthStamp =
-            oneMonthAgo.getFullYear().toString() +
-            zeroPad(oneMonthAgo.getMonth() + 1) +
-            zeroPad(oneMonthAgo.getDate()) +
-            zeroPad(oneMonthAgo.getHours()) +
-            zeroPad(oneMonthAgo.getMinutes());
+        let [tomorrowStamp, oneMonthStamp] = generatePriceDates();
 
         let token = process.env.ENTSOE_SECURITY_TOKEN || "";
 
@@ -330,11 +343,31 @@ export const getDayAheadData = async (wait: boolean, timeout: number) => {
             }
             const result = parseDayAheadData(await response.text());
 
-            await cachePut("price", JSON.stringify(result))
+            await cachePut("price", JSON.stringify(result));
 
             return result;
         } catch (e) {
             return { error: "Failed to fetch price data" };
         }
+    }
+};
+
+export const storeDayAheadData = async () => {
+    let [tomorrowStamp, oneMonthStamp] = generatePriceDates();
+
+    let token = process.env.ENTSOE_SECURITY_TOKEN || "";
+
+    let url = `https://web-api.tp.entsoe.eu/api?documentType=A44&out_Domain=10YFI-1--------U&in_Domain=10YFI-1--------U&periodStart=${oneMonthStamp}&periodEnd=${tomorrowStamp}&securityToken=${token}`;
+    try {
+        var response = await fetch(url, {
+            cache: "no-cache",
+        });
+        if (response.status != 200) {
+            return { error: "Failed to fetch price data" };
+        }
+        const result = parseDayAheadData(await response.text());
+        await durableCachePut("price", JSON.stringify(result));
+    } catch (e) {
+        return { error: "Failed to fetch price data" };
     }
 };

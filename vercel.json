@@ -1,0 +1,8 @@
+{
+	"crons": [
+	  {
+		"path": "/api/storeprice",
+		"schedule": "0 14 * * *"
+	  }
+	]
+  }
