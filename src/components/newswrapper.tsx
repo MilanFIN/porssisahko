@@ -9,6 +9,8 @@ import {
 } from "@/app/actions";
 import News from "./news";
 
+export const dynamic = "force-dynamic";
+
 export async function NewsWrapper() {
     const yleArticles = await getYleContent(true);
     const hsArticles = await getHsContent(true);

@@ -19,6 +19,8 @@ import Link from "next/link";
 import DarkModeCheckBox from "@/components/darkmodecheckbox";
 import { DarkThemeProvider } from "./providers";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
     return (
         <DarkThemeProvider>
@@ -66,9 +68,7 @@ export default function Home() {
                             </div>
                             <div className="w-full grid justify-items-center  ">
                                 <div className="w-[95%]">
-                                    <Suspense fallback={<LineChartSkeleton />}>
-                                        <LineChartWrapper />
-                                    </Suspense>
+                                    <LineChartWrapper />
                                 </div>
                             </div>
                         </div>
