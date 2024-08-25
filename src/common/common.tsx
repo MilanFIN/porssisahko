@@ -30,3 +30,11 @@ export interface  TimeSeriesPrice {
     Timestamp: string;
     Value: number;
 }
+
+export interface Result {
+    header: string;
+    href: string;
+    image: string;
+    imagealt?: string;
+    date?: string;
+}

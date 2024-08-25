@@ -1,12 +1,12 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import NewsList from "./newslist";
-import { Article } from "@/common/common";
+import { Article, Result } from "@/common/common";
 
 interface NewsProps {
     apiSources: string[];
     sources: string[];
-    articles: Array<Array<Article>>;
+    articles: Promise<Array<Result>>[];
 }
 
 interface NewsCategoryProps {

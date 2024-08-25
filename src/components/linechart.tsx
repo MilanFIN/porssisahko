@@ -536,7 +536,7 @@ function LineChart(props: LineChartProps) {
                 ) : (
                     <div className="w-full grid items-center">
                         <span className="w-full text-white text-center">
-                            {"Hintadatan haussa tapahtui virhe"}
+                            {"Hintadatan haussa tapahtui virhe. Päivitä sivu uudelleen."}
                         </span>
                     </div>
                 )}

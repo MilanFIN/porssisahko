@@ -79,9 +79,7 @@ export default function Home() {
                             </h2>
 
                             <div className="h-[625px] w-full rounded-lg">
-                                <Suspense fallback={<NewsSkeleton />}>
-                                    <NewsWrapper />
-                                </Suspense>
+                                <NewsWrapper />
                             </div>
                         </div>
                     </div>

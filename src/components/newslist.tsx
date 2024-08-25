@@ -1,12 +1,12 @@
 "use client";
-
-import { zeroPad, Article } from "@/common/common";
+import Image from "next/image";
+import { zeroPad, Article, Result } from "@/common/common";
 import React, { ReactNode, useEffect, useState } from "react";
 
 interface NewsListProps {
     apiSource: string;
     source: string;
-    articles: Array<Article>;
+    articles: Promise<Array<Result>>;
 }
 
 interface NewsItemProps {
@@ -43,10 +43,13 @@ export function NewsItem(props: NewsItemProps) {
                          text-white hover:text-black dark:text-black  dark:hover:bg-yellow-400"
         >
             <a className="w-full flex " href={props.item.href} target="_blank">
-                <img
+                <Image
                     className=" h-[100px] flex-none object-cover rounded-lg mr-2" //w-[177px]
                     src={props.item.image}
-                ></img>
+                    alt={""}
+                    width={196}
+                    height={110}
+                ></Image>
                 <div className=" grow">
                     <span className="w-full font-bold">
                         {props.item.header}
@@ -62,15 +65,33 @@ export function NewsItem(props: NewsItemProps) {
 }
 
 function NewsList(props: NewsListProps) {
+    const [readyArticles, setReadyArticles] = useState<Array<Result> | null>(
+        null
+    );
+
+    useEffect(() => {
+        async function test(articles: Promise<Array<Result>>) {
+            setReadyArticles(await articles);
+        }
+        test(props.articles);
+    }, [props.articles]);
+
     return (
         <div className="h-full w-full bg-zinc-700 dark:bg-zinc-300 p-2 rounded-b-lg">
-            <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
-                {props.articles.length != 0
-                    ? props.articles
-                          .slice(0, 20)
-                          .map((item: Article) => <NewsItem key={item.header + "Item"} item={item} />)
-                    : null}
-            </ul>
+            {readyArticles != null ? (
+                <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
+                    {readyArticles.length != 0
+                        ? readyArticles
+                              .slice(0, 20)
+                              .map((item: Result) => (
+                                  <NewsItem
+                                      key={item.header + "Item"}
+                                      item={item as Article}
+                                  />
+                              ))
+                        : null}
+                </ul>
+            ) : null}
         </div>
     );
 }

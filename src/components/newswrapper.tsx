@@ -10,12 +10,14 @@ import {
 import News from "./news";
 
 export const dynamic = "force-dynamic";
+//todo: remove async await from here, and pass getcontent result as a promise instead
+//that way results won't 
 
 export async function NewsWrapper() {
-    const yleArticles = await getYleContent(true);
-    const hsArticles = await getHsContent(true);
-    const isArticles = await getIsContent(true);
-    const ilArticles = await getIlContent(true);
+    const yleArticles = getYleContent(true);
+    const hsArticles = getHsContent(true);
+    const isArticles = getIsContent(true);
+    const ilArticles = getIlContent(true);
 
     return (
         <News

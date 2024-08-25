@@ -35,7 +35,6 @@ describe("Yle", () => {
             expect(item).toHaveProperty("href");
             expect(item).toHaveProperty("image");
             expect(item).toHaveProperty("imagealt");
-            expect(item).toHaveProperty("date");
         });
     });
 });

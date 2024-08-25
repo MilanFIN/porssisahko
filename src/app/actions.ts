@@ -1,6 +1,6 @@
 "use server";
 
-import { TimeSeriesPrice, zeroPad } from "@/common/common";
+import { Result, TimeSeriesPrice, zeroPad } from "@/common/common";
 import { TIMEOUT } from "dns";
 import cacheData from "memory-cache";
 import { revalidateTag } from "next/cache";
@@ -9,14 +9,6 @@ import { kv } from "@vercel/kv";
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 var convert = require("xml-js");
-
-export interface Result {
-    header: string;
-    href: string;
-    image: string;
-    imagealt?: string;
-    date?: string;
-}
 
 async function cacheGet(key: string) {
     if (process.env.ENVIRONMENT == "development") {
@@ -38,7 +30,7 @@ async function cachePut(key: string, value: string) {
 
 async function durableCachePut(key: string, value: string) {
     if (process.env.ENVIRONMENT == "development") {
-        cacheData.put(key, value, 1000 * 3600*24);
+        cacheData.put(key, value, 1000 * 3600 * 24);
     } else {
         await kv.set(key, value);
         await kv.expire(key, 3600 * 24);
@@ -46,38 +38,61 @@ async function durableCachePut(key: string, value: string) {
 }
 
 export const parseYleContent = (data: string) => {
-    const NEWSURL = "http://yle.fi";
+    const NEWSURL = "http://yle.fi/a/";
     const IMAGEURL =
         "https://images.cdn.yle.fi/image/upload/w_196,h_110,ar_1.7777777777777777,dpr_1,c_fill/q_auto:eco,f_auto,fl_lossy/v420/";
 
     let results = new Array<Result>();
+    const dom = new JSDOM(data);
+    const scripts = dom.window.document.getElementsByTagName("script");
+    let jsonString = "";
 
-    let lineContent = data.split("\n");
-    let initialScript = lineContent[lineContent.length - 5];
-    let removedStart = initialScript.substring(initialScript.indexOf("{"));
-    let removedEnd = removedStart.substring(
-        0,
-        removedStart.lastIndexOf("}") + 1
-    );
-    let initialState = JSON.parse(removedEnd);
+    let initialStateScriptContent = "";
+    for (let script of scripts) {
+        if (script.textContent.includes("window.__INITIAL__STATE__")) {
+            initialStateScriptContent = script.textContent;
 
-    initialState.pageData.layout.forEach((element: any) => {
-        let result: Result = {
-            header: element.texts.headline.text,
-            href: NEWSURL + element.url,
-            image: IMAGEURL + element.image.id,
-            imagealt: element.image.alt,
-            date: element.publishedAt,
-        };
-        results.push(result);
-    });
-    return results;
+            const startIndex = initialStateScriptContent.indexOf("{");
+            const endIndex = initialStateScriptContent.lastIndexOf("}");
+
+            if (startIndex !== -1 && endIndex !== -1) {
+                jsonString = initialStateScriptContent.substring(
+                    startIndex,
+                    endIndex + 1
+                );
+            }
+            break;
+        }
+    }
+
+    let jsonObject = JSON.parse(jsonString);
+
+    for (let key in Object.keys(jsonObject.pageData!.layout)) {
+        let item = jsonObject.pageData!.layout[key];
+        if (item.type == "article") {
+            let image = "";
+            let alt = "";
+            if (item.hasOwnProperty("image")) {
+                image = IMAGEURL + item.image.id;
+                alt = item.image.alt;
+            }
+            let result: Result = {
+                header: item.texts.headline.text,
+                href: item.url,
+                image: image,
+                imagealt: alt,
+            };
+            results.push(result);
+        }
+    }
+
+    return results.slice(0,10);
 };
 
-export const getYleContent = async (wait: boolean) => {
+export const getYleContent = async (wait: boolean): Promise<Result[]> => {
     const url = "https://yle.fi/uutiset/18-205950";
     const value = await cacheGet("yle");
-    if (value) {
+    if (value && true) {
         return value;
     } else if (wait) {
         try {
@@ -121,7 +136,7 @@ export const parseHsContent = (data: string) => {
     return results;
 };
 
-export const getHsContent = async (wait: boolean) => {
+export const getHsContent = async (wait: boolean): Promise<Result[]> => {
     const url = "https://www.hs.fi/aihe/sahko/";
     const value = await cacheGet("hs");
     if (value) {
@@ -191,7 +206,7 @@ export const parseIsContent = (data: string) => {
     return results;
 };
 
-export const getIsContent = async (wait: boolean) => {
+export const getIsContent = async (wait: boolean): Promise<Result[]> => {
     const url = "https://www.is.fi/aihe/sahko/";
     const value = await cacheGet("is");
     if (value) {
@@ -232,7 +247,7 @@ export const parseIlContent = (data: Record<string, any>) => {
     return results;
 };
 
-export const getIlContent = async (wait: boolean) => {
+export const getIlContent = async (wait: boolean): Promise<Result[]> => {
     const url =
         "https://api.il.fi/v1/articles/search?q=s%C3%A4hk%C3%B6&limit=10&image_sizes[]=size138";
     const value = await cacheGet("il");
@@ -317,6 +332,7 @@ function generatePriceDates() {
 }
 
 export const getDayAheadData = async (wait: boolean, timeout: number) => {
+
     const value = await cacheGet("price");
     if (value) {
         return value;
