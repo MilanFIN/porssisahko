@@ -1,4 +1,4 @@
-function ArticleSkeleton(props: { keyIter: string }) {
+export function ArticleSkeleton(props: { keyIter: string }) {
     return (
         <li
             key={"loadingItem" + props.keyIter}

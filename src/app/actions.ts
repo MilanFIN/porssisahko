@@ -10,6 +10,8 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 var convert = require("xml-js");
 
+var NEXTACTIONTIMEOUT = 8500;
+
 async function cacheGet(key: string) {
     if (process.env.ENVIRONMENT == "development") {
         return JSON.parse(cacheData.get(key));
@@ -86,7 +88,7 @@ export const parseYleContent = (data: string) => {
         }
     }
 
-    return results.slice(0,10);
+    return results.slice(0, 10);
 };
 
 export const getYleContent = async (wait: boolean): Promise<Result[]> => {
@@ -96,7 +98,11 @@ export const getYleContent = async (wait: boolean): Promise<Result[]> => {
         return value;
     } else if (wait) {
         try {
-            const response = await fetch(url, { cache: "no-store" });
+            const response = await fetch(url, {
+                cache: "no-store",
+                signal: AbortSignal.timeout(NEXTACTIONTIMEOUT),
+            });
+
             let results = parseYleContent(await response.text());
             await cachePut("yle", JSON.stringify(results));
 
@@ -143,7 +149,10 @@ export const getHsContent = async (wait: boolean): Promise<Result[]> => {
         return value;
     } else if (wait) {
         try {
-            const response = await fetch(url, { cache: "no-store" });
+            const response = await fetch(url, {
+                cache: "no-store",
+                signal: AbortSignal.timeout(NEXTACTIONTIMEOUT),
+            });
             let results = parseHsContent(await response.text());
 
             await cachePut("hs", JSON.stringify(results));
@@ -213,7 +222,9 @@ export const getIsContent = async (wait: boolean): Promise<Result[]> => {
         return value;
     } else if (wait) {
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                signal: AbortSignal.timeout(NEXTACTIONTIMEOUT),
+            });
             let results = parseIsContent(await response.text());
 
             await cachePut("is", JSON.stringify(results));
@@ -255,7 +266,10 @@ export const getIlContent = async (wait: boolean): Promise<Result[]> => {
         return value;
     } else if (wait) {
         try {
-            const response = await fetch(url, { cache: "no-store" });
+            const response = await fetch(url, {
+                cache: "no-store",
+                signal: AbortSignal.timeout(NEXTACTIONTIMEOUT),
+            });
             let data = await response.json();
             data = data.response;
 
@@ -332,7 +346,6 @@ function generatePriceDates() {
 }
 
 export const getDayAheadData = async (wait: boolean, timeout: number) => {
-
     const value = await cacheGet("price");
     if (value) {
         return value;

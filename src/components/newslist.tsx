@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { zeroPad, Article, Result } from "@/common/common";
 import React, { ReactNode, useEffect, useState } from "react";
+import { ArticleSkeleton } from "./newsskeleton";
 
 interface NewsListProps {
     apiSource: string;
@@ -89,9 +90,15 @@ function NewsList(props: NewsListProps) {
                                       item={item as Article}
                                   />
                               ))
-                        : null}
+                        : <div className="w-full text-center mt-8 text-white">Artikkelien haku epäonnistui.</div>}
                 </ul>
-            ) : null}
+            ) : (
+                <ul className="h-full w-full overflow-y-auto rounded-lg transparent">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                        <ArticleSkeleton keyIter={"articleskeleton" + index} />
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }
