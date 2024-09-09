@@ -39,7 +39,7 @@ export async function LineChartSkeleton() {
                         alv 0%
                     </button>
                     <button className={`rounded-xl mx-1 py-1 px-2 bg-gray-300 dark:bg-gray-400`}>
-                        alv 24%
+                        alv 25.5%
                     </button>
 
                     <span className="grow"></span>

@@ -78,7 +78,7 @@ interface ChartData {
 
 function LineChart(props: LineChartProps) {
     const [fetchError, setFetchError] = useState(0);
-    const [tax, setTax] = useState(0.24);
+    const [tax, setTax] = useState(0.255);
     const [history, setHistory] = useState(7);
 
     const [totalChartData, setTotalChartData] = useState<ChartData>(
@@ -394,9 +394,9 @@ function LineChart(props: LineChartProps) {
                         className={`rounded-xl mx-1 py-1 px-2 hover:bg-yellow-400 ${
                             tax !== 0 ? "bg-yellow-400" : "bg-gray-300 dark:bg-gray-400"
                         }`}
-                        onClick={() => setTax(0.24)}
+                        onClick={() => setTax(0.255)}
                     >
-                        alv 24%
+                        alv 25.5%
                     </button>
 
                     <span className="grow"></span>
