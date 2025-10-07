@@ -301,10 +301,11 @@ export const parseDayAheadData = (data: string) => {
         let dataPoints = period.Point;
 
         dataPoints.forEach((point: any) => {
-            let hoursOffset = parseInt(point.position._text) - 1;
+            console.log(point);
+            let timeOffset = parseInt(point.position._text) - 1;
             let correspondingDate = new Date(startTime.getTime());
-            correspondingDate.setHours(
-                correspondingDate.getHours() + hoursOffset
+            correspondingDate.setMinutes(
+                correspondingDate.getMinutes() + timeOffset * 15
             );
             let price = parseFloat(point["price.amount"]._text);
             timeData.push({
@@ -313,6 +314,7 @@ export const parseDayAheadData = (data: string) => {
             } as TimeSeriesPrice);
         });
     });
+    console.log(timeData[timeData.length - 1]);
 
     return {
         date: jsonData.Publication_MarketDocument.createdDateTime._text,

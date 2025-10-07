@@ -146,11 +146,11 @@ function LineChart(props: LineChartProps) {
         }
 
         newChartData.datasets[0].data = newChartData.datasets[0].data.slice(
-            count - 24 * includedDayCount,
+            count - 24 * 4 * includedDayCount,
             count
         );
         newChartData.labels = newChartData.labels.slice(
-            count - 24 * includedDayCount,
+            count - 24 * 4 * includedDayCount,
             count
         );
         newChartData.datasets[0].data.forEach(
@@ -311,6 +311,7 @@ function LineChart(props: LineChartProps) {
     ];
 
     const calculateAverage = (hInPast: number) => {
+        hInPast *= 4;
         const now = new Date();
         const ticks = totalChartData.labels;
         let latestIndex =
